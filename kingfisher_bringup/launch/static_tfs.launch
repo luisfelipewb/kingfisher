@@ -1,0 +1,12 @@
+<launch>
+    <!-- <node pkg="kf_launch" type="beat.py" name="tfbeat" output="screen">
+        <param name="rate" value="4"/>
+    </node> -->
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="gps_broadcaster" args="-0.51 0.0 0.3 0 0 0 /kingfisher/base /kingfisher/gps" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hazcam_broadcaster" args="0.155 0 -0.043 0 0 0 /kingfisher/base /kingfisher/hazcam" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="lidar_broadcaster" args="-0.3 0 0.076 0 0 3.14159 /kingfisher/base /kingfisher/laser" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="imu_broadcaster" args="-0.3 0 -0.2 0 0 0 /kingfisher/base /kingfisher/imu" />
+
+    <node pkg="kingfisher_static_tfs" type="publish_kf_tf.py" name="odom_broadcaster"/>
+</launch>

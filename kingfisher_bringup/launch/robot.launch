@@ -1,0 +1,13 @@
+<!-- Main launchfile that starts automatically on boot -->
+<!--   See:  http://wiki.ros.org/robot_upstart --> 
+<!--   sudo systemctl status kingfisher.service -->
+
+<launch>
+
+  <include file="$(find kingfisher_bringup)/launch/static_tfs.launch" />
+
+  <include file="$(find kingfisher_bringup)/launch/base.launch" />
+  
+  <include file="$(find kingfisher_bringup)/launch/lidar.launch" />
+
+</launch>

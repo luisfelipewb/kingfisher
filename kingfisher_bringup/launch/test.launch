@@ -1,0 +1,12 @@
+<launch>
+  <!-- For testing the boat out of the water -->
+
+  <include file="$(find kingfisher_bringup)/launch/static_tfs.launch" />
+
+  <node pkg="kingfisher_node" type="kingfisher.py" name="kingfisher" />
+
+  <include file="$(find kingfisher_drive_viz)/launch/kf_drive_viz.launch" />
+  
+  <include file="$(find kingfisher_bringup)/launch/lidar.launch" />
+
+</launch>

@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import roslib; roslib.load_manifest('kingfisher_bringup')
-
 import rospy
 from std_msgs.msg import Bool
 import subprocess
@@ -9,8 +7,8 @@ import subprocess
 
 rospy.init_node('wifi_monitor')
 
-pub = rospy.Publisher('has_wifi', Bool)
-dev = rospy.get_param('~dev', 'wlan0')
+pub = rospy.Publisher('has_wifi', Bool, queue_size=1)
+dev = rospy.get_param('~dev', 'wlx00c0ca91ebc1')
 hz = rospy.get_param('~hz', 1)
 previous_error = False
 previous_success = False
@@ -19,7 +17,7 @@ r = None
 while not rospy.is_shutdown():
   try:
     wifi_str = subprocess.check_output(['ifconfig', dev], stderr=subprocess.STDOUT);
-    if "inet addr" in wifi_str:
+    if "inet" in wifi_str:
       pub.publish(True)
     else:
       pub.publish(False)
