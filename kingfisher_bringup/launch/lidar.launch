@@ -2,7 +2,7 @@
   <group ns="lidar">
     <node pkg="lms1xx" type="LMS1xx_node" name="lidar">
       <param name="host" value="192.168.1.14" />
-      <param name="frame_id" value="kingfisher/laser"/>
+      <param name="frame_id" value="laser"/>
     </node>
     <node pkg="topic_tools" type="throttle" name="lidar_throttle" args="messages /lidar/scan 10">
     </node>

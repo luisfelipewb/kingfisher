@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <node name="kf_drive_viz" pkg="kingfisher_drive_viz" type="kf_drive_viz.py" output="screen">
+        <param name="base_frame" value="base_link"/>
+        <remap from="~cmd_drive" to="/cmd_drive"/>
+    </node>
+
+</launch>
