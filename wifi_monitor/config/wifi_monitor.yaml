@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    # WiFi interface to watch. This name is derived from the dongle's MAC
+    # address by systemd's predictable naming, so it changes if the dongle is
+    # swapped. 
+    dev: "wlx00c0ca91ebc1"
+    # Poll rate, Hz. On a failure the node backs off to one try per 10 s.
+    hz: 1.0

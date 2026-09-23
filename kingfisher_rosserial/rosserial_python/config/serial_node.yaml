@@ -1,0 +1,13 @@
+/**:
+  ros__parameters:
+    # Serial port for the Kingfisher MCU.
+    #
+    # /dev/arduino is the stable symlink from
+    # kingfisher_bringup/udev/10-arduino.rules. Prefer it over /dev/ttyACM0,
+    # which renumbers on replug. If that rule is not installed on the boat,
+    # override with:  ros2 launch ... port:=/dev/ttyACM0
+    port: "/dev/arduino"
+    baud: 57600
+    # Seconds without an MCU sync before the bridge re-requests topics.
+    # Also sets the read timeout to half this value at startup.
+    timeout: 5.0

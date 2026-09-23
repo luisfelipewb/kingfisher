@@ -107,14 +107,14 @@ class Subscriber:
 
 class SerialClient(Node):
     def __init__(self):
-        super().__init__("rosserial_client")
-        self.declare_parameter('~/port', "/dev/ttyACM0")
-        self.declare_parameter('~/baud', 57600)
-        self.declare_parameter('~/timeout', 5.0)
+        super().__init__("kingfisher_serial")
+        self.declare_parameter('port', "/dev/ttyACM0")
+        self.declare_parameter('baud', 57600)
+        self.declare_parameter('timeout', 5.0)
 
-        port=self.get_parameter("~/port").get_parameter_value().string_value
-        baud=self.get_parameter("~/baud").get_parameter_value().integer_value
-        self.timeout=self.get_parameter("~/timeout").get_parameter_value().double_value
+        port=self.get_parameter("port").get_parameter_value().string_value
+        baud=self.get_parameter("baud").get_parameter_value().integer_value
+        self.timeout=self.get_parameter("timeout").get_parameter_value().double_value
 
         """ Initialize node, connect to bus, attempt to negotiate topics. """
         self.mutex = threading.Lock()

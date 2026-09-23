@@ -10,12 +10,12 @@ class WifiMonitor(Node):
 
     def __init__(self):
         super().__init__('wifi_monitor')
-        self.declare_parameter('~/dev', 'wlx00c0ca91ebc1')
-        self.declare_parameter('~/hz', 1.0)
-        self.dev=self.get_parameter("~/dev").get_parameter_value().string_value
-        self.hz=self.get_parameter("~/hz").get_parameter_value().double_value
+        self.declare_parameter('dev', 'wlan0')
+        self.declare_parameter('hz', 1.0)
+        self.dev=self.get_parameter("dev").get_parameter_value().string_value
+        self.hz=self.get_parameter("hz").get_parameter_value().double_value
 
-        self.publisher = self.create_publisher(Bool, '/has_wifi', 1)
+        self.publisher = self.create_publisher(Bool, 'has_wifi', 1)
         timer_period = 1.0/self.hz  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
@@ -38,7 +38,10 @@ class WifiMonitor(Node):
                 self.previous_error = False
                 self.get_logger().info("Retrieved status of interface %s. Now updating at %f Hz." % (self.dev, self.hz))
 
-        except subprocess.CalledProcessError:
+        # OSError covers a missing ifconfig: net-tools is not installed by
+        # default on Ubuntu 24.04. Without it the FileNotFoundError escapes
+        # the timer callback and kills the node.
+        except (subprocess.CalledProcessError, OSError):
             if not self.previous_error:
                 self.previous_error = True
                 self.previous_success = False
