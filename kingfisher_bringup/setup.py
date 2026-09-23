@@ -20,7 +20,7 @@ setup(
     zip_safe=True,
     maintainer='Luis Felipe Wolf Batista',
     maintainer_email='luis.batista@gatech.edu',
-    description='Cross-package launch compositions for the Kingfisher USV.',
+    description='Cross-package launch compositions for the Kingfisher ASV.',
     license='BSD-3-Clause',
     extras_require={
         'test': [
