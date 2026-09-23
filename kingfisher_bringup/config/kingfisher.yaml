@@ -1,0 +1,31 @@
+# Boat configuration. Self-contained: bringup launches nodes directly and
+# does not include the per-package launch files, which stay in their own
+# packages for debugging.
+
+kingfisher_serial:
+  ros__parameters:
+    # /dev/arduino is the stable symlink from udev/10-arduino.rules.
+    # ttyACM0 renumbers on replug. Override with port:=
+    port: "/dev/arduino"
+    baud: 57600
+    timeout: 5.0
+
+kingfisher_twist:
+  ros__parameters:
+    rotation_scale: 0.60
+    fwd_speed_scale: 1.0
+    rev_speed_scale: 1.0
+    left_max: 1.0
+    right_max: 1.0
+    # seconds at zero thrust before reversing sign
+    dead_time: 0.25
+
+wifi_monitor:
+  ros__parameters:
+    # MAC-derived name; changes if the dongle is swapped. Check `ip link`.
+    dev: "wlx00c0ca91ebc1"
+    hz: 1.0
+
+kingfisher_viz:
+  ros__parameters:
+    base_frame: "base_link"
