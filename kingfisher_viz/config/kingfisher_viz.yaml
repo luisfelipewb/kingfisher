@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    # Frame the thrust arrows are drawn in. Matches the boat's static TF tree
+    # (kingfisher_bringup/launch/static_tfs.launch) until the description
+    # lands in Stage B and robot_state_publisher takes over.
+    base_frame: "base_link"
