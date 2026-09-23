@@ -1,0 +1,12 @@
+/**:
+  ros__parameters:
+    # cmd_vel angular.z -> differential thrust gain
+    rotation_scale: 0.60
+    # cmd_vel linear.x -> thrust gain, per direction
+    fwd_speed_scale: 1.0
+    rev_speed_scale: 1.0
+    # per-thruster output ceiling, applied after saturation
+    left_max: 1.0
+    right_max: 1.0
+    # seconds to hold zero thrust before reversing sign
+    dead_time: 0.25
