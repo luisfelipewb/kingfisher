@@ -3,8 +3,9 @@
 From ros1/launch/static_tfs.launch. Jazzy's static_transform_publisher
 takes named flags only, and tf2 rejects a leading slash on frame ids.
 
-Replaced by robot_state_publisher in Stage B; these numbers are the
-ground truth the URDF has to match.
+Superseded by kingfisher_description, which has newer poses and ROS
+link names. Still used by robot.launch.py until robot_state_publisher
+replaces it.
 """
 
 from launch import LaunchDescription

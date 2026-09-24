@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+Fixed (non-steerable) jet thruster of the Kingfisher M200.
+
+Creates a housing link rigidly attached to base_link and, at the same origin, a
+propeller link on a continuous joint named ${prefix}_engine_propeller_joint, which is
+the joint driven by gz::sim::systems::Thruster (see
+kingfisher_gazebo). The propeller joint name follows the WAM-V
+convention (<prefix>_engine_propeller_joint) so the VRX bridge generation
+works unchanged.
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="kingfisher_thruster" params="prefix position:='0 0 0' orientation:='0 0 0'">
+    <xacro:property name="housing_radius" value="0.04"/>
+    <xacro:property name="housing_length" value="0.16"/>
+    <xacro:property name="housing_mass" value="0.5"/>
+    <xacro:property name="prop_radius" value="0.04"/>
+    <xacro:property name="prop_length" value="0.02"/>
+    <xacro:property name="prop_mass" value="0.05"/>
+
+    <!-- Housing (jet drive tube), aligned with the x axis -->
+    <link name="${prefix}_thruster_link">
+      <visual name="${prefix}_thruster_visual">
+        <origin xyz="0 0 0" rpy="0 ${pi/2} 0"/>
+        <geometry>
+          <cylinder radius="${housing_radius}" length="${housing_length}"/>
+        </geometry>
+        <material name="Black"/>
+      </visual>
+      <collision name="${prefix}_thruster_collision">
+        <origin xyz="0 0 0" rpy="0 ${pi/2} 0"/>
+        <geometry>
+          <cylinder radius="${housing_radius}" length="${housing_length}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${housing_mass}"/>
+        <inertia
+          ixx="${(housing_mass/2) * housing_radius*housing_radius}"
+          iyy="${(housing_mass/12) * (3*housing_radius*housing_radius + housing_length*housing_length)}"
+          izz="${(housing_mass/12) * (3*housing_radius*housing_radius + housing_length*housing_length)}"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_base_thruster_joint" type="fixed">
+      <origin xyz="${position}" rpy="${orientation}"/>
+      <parent link="base_link"/>
+      <child link="${prefix}_thruster_link"/>
+    </joint>
+
+    <!-- Propeller / impeller, spins about x. No geometry; the mass keeps the
+         link (and the Thruster joint) in the SDF. -->
+    <link name="${prefix}_propeller_link">
+      <inertial>
+        <mass value="${prop_mass}"/>
+        <inertia
+          ixx="${(prop_mass/2) * prop_radius*prop_radius}"
+          iyy="${(prop_mass/12) * (3*prop_radius*prop_radius + prop_length*prop_length)}"
+          izz="${(prop_mass/12) * (3*prop_radius*prop_radius + prop_length*prop_length)}"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_engine_propeller_joint" type="continuous">
+      <axis xyz="1 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}_thruster_link"/>
+      <child link="${prefix}_propeller_link"/>
+      <!-- The Thruster plugin commands ~200 rad/s at full thrust; keep the limit above that -->
+      <limit effort="100" velocity="1000"/>
+      <dynamics friction="0.05" damping="0.05"/>
+    </joint>
+  </xacro:macro>
+</robot>

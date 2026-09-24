@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+Sensor frames of the Kingfisher M200.
+
+Every macro creates a frame-only link (<name>_link: no visual, collision or
+mass) on a fixed joint. The Gazebo sensors attached to these links are in
+kingfisher_gazebo/urdf/kingfisher_sensors_gazebo.xacro.
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="kingfisher_frame" params="name parent:=base_link xyz:='0 0 0' rpy:='0 0 0'">
+    <link name="${name}_link"/>
+    <joint name="${name}_joint" type="fixed">
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Monocular camera. <name>_link is the camera body (x forward, z up),
+       <name>_link_optical the REP 103 optical frame (z forward). -->
+  <xacro:macro name="kingfisher_camera" params="name:=camera parent:=base_link xyz:='0 0 0' rpy:='0 0 0'">
+    <xacro:kingfisher_frame name="${name}" parent="${parent}" xyz="${xyz}" rpy="${rpy}"/>
+    <link name="${name}_link_optical"/>
+    <joint name="${name}_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+      <parent link="${name}_link"/>
+      <child link="${name}_link_optical"/>
+    </joint>
+  </xacro:macro>
+</robot>

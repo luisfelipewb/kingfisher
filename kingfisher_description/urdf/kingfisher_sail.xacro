@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+Rotating sail of the Kingfisher M200.
+
+Creates sail_motor_link, fixed to base_link, and sail_link 8 cm above it on a
+continuous joint about z (sail_joint). The sail encoder will provide the
+joint angle; in sim, joint friction holds the sail to the hull.
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="kingfisher_sail" params="xyz">
+    <xacro:property name="sail_mass" value="0.5"/>
+    <xacro:property name="sail_height" value="0.70"/>
+    <xacro:property name="sail_radius" value="0.14"/>
+
+    <!-- Motor: frame only for now -->
+    <link name="sail_motor_link"/>
+    <joint name="sail_motor_joint" type="fixed">
+      <origin xyz="${xyz}" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="sail_motor_link"/>
+    </joint>
+
+    <link name="sail_link">
+      <!-- Mesh is in mm, z up, rotation axis through its origin -->
+      <visual name="sail_visual">
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+        <geometry>
+          <mesh filename="package://kingfisher_description/meshes/kingfisher_sail.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="DarkGray"/>
+      </visual>
+      <collision name="sail_collision">
+        <origin xyz="0 0 ${sail_height/2}" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${sail_radius}" length="${sail_height}"/>
+        </geometry>
+      </collision>
+      <!-- Centre of mass and inertia per kg computed from the mesh, turned by pi as above -->
+      <inertial>
+        <origin xyz="-0.0234 0 0.348" rpy="0 0 0"/>
+        <mass value="${sail_mass}"/>
+        <inertia
+          ixx="${sail_mass * 0.0414}"
+          iyy="${sail_mass * 0.0435}"
+          izz="${sail_mass * 0.00224}"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+
+    <joint name="sail_joint" type="continuous">
+      <axis xyz="0 0 1"/>
+      <origin xyz="0 0 0.08" rpy="0 0 0"/>
+      <parent link="sail_motor_link"/>
+      <child link="sail_link"/>
+      <dynamics friction="0.1" damping="0.1"/>
+    </joint>
+  </xacro:macro>
+</robot>

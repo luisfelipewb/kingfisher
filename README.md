@@ -7,6 +7,7 @@ ROS 2 stack for the Kingfisher ASV.
 | package | build type | what it does |
 |---|---|---|
 | `kingfisher_msgs` | ament_cmake | `Drive` and `Sense`, wire-compatible with the MCU |
+| `kingfisher_description` | ament_cmake | URDF/xacro and meshes, no Gazebo |
 | `kingfisher_rosserial` | — | the MCU bridge, see its own README |
 | `kingfisher_twist` | ament_python | `cmd_vel` → `cmd_drive` |
 | `kingfisher_viz` | ament_python | thrust arrows for RViz |
@@ -24,7 +25,23 @@ ros2 launch kingfisher_bringup robot.launch.py
 configuration. Each package also keeps its own `launch/` and `config/` for
 running a node on its own while debugging; those are not used in normal operation.
 
+## Robot description
 
+`kingfisher_description` holds the boat's geometry. Link names are plain
+(`base_link`, `imu_link`, `lidar_link`, …); `robot_state_publisher` adds the
+`kingfisher/` prefix through `frame_prefix`. The simulation
+([`kingfisher_simulation`](https://github.com/luisfelipewb/kingfisher_simulation))
+builds on the same URDF, so the sim and the boat share one set of frames.
+
+```bash
+ros2 launch kingfisher_description display.launch.py   # RViz, no boat needed
+```
+
+`robot.launch.py` still publishes the older frames from `static_tfs.launch.py`
+(`sbg`, `laser`, …). The switch to `robot_state_publisher` is pending.
+
+The package started from Clearpath's
+[kf/kingfisher](https://github.com/kf/kingfisher) @ `indigo-devel` `c7fb559`.
 
 ## Deliberately left on `noetic`
 

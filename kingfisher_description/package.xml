@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>kingfisher_description</name>
+  <version>1.0.0</version>
+  <description>
+    URDF/xacro description of the Clearpath Kingfisher M200 ASV. No Gazebo
+    dependencies; the simulation layer is kingfisher_gazebo.
+  </description>
+  <maintainer email="luisfelipewb@gmail.com">Luis Batista</maintainer>
+  <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>xacro</exec_depend>
+  <!-- display.launch.py -->
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
