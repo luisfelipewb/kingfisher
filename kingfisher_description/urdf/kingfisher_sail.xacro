@@ -4,7 +4,7 @@ Rotating sail of the Kingfisher M200.
 
 Creates sail_motor_link, fixed to base_link, and sail_link 8 cm above it on a
 continuous joint about z (sail_joint). The sail encoder will provide the
-joint angle; in sim, joint friction holds the sail to the hull.
+joint angle; in sim, kingfisher_gazebo's position controller turns and holds it.
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="kingfisher_sail" params="xyz">

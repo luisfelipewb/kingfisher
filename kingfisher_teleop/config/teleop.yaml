@@ -2,13 +2,14 @@
 # pad's indices with `ros2 topic echo /kingfisher/joy`.
 #
 #   axes:    0 left horiz.  1 left vert.  3 right horiz.  4 right vert.
-#            (2, 5 triggers; 6, 7 D-pad)
+#            6 D-pad horiz. (left +1)  (2, 5 triggers; 7 D-pad vert.)
 #   buttons: 0 A  1 B  2 X  3 Y  4 LB  5 RB  6 Back  7 Start
 #
 # Hold LB (arcade) or RB (tank) to drive, never both: each publishes on its
 # own. Nothing is sent on release, so the MCU or cmd_drive_translate zeroes
-# the thrusters. Sail presets send once per press; rad, + is counter-clockwise
-# seen from above.
+# the thrusters. Sail angles are rad, + counter-clockwise seen from above:
+# the D-pad turns the sail while LB or RB is held, and presets send once per
+# press.
 
 /**/joy_teleop:
   ros__parameters:
@@ -40,6 +41,30 @@
           offset: 0.0
         right:
           axis: 4
+          scale: 1.0
+          offset: 0.0
+
+    # D-pad left/right: sail/cmd_rate in rad/s, which sail_jog clamps to its
+    # max_rate. One entry per deadman; joy_teleop ANDs the buttons in a list.
+    sail_turn_lb:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_rate
+      deadman_buttons: [4]
+      axis_mappings:
+        data:
+          axis: 6
+          scale: 1.0
+          offset: 0.0
+
+    sail_turn_rb:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_rate
+      deadman_buttons: [5]
+      axis_mappings:
+        data:
+          axis: 6
           scale: 1.0
           offset: 0.0
 

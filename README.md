@@ -30,8 +30,9 @@ running a node on its own while debugging; those are not used in normal operatio
 
 `kingfisher_teleop` configures `joy` and `joy_teleop` for a Logitech F310 in XInput mode. Hold LB to
 drive through `cmd_vel` (left stick throttle, right stick turn), or RB for `cmd_drive` (one stick per
-thruster). Releasing either stops the stream, and the thrusters stop. X, Back, Y, Start and B set the
-sail to +90°, +45°, 0, −45° and −90°.
+thruster). Releasing either stops the stream, and the thrusters stop. With LB or RB held, D-pad
+left/right turns the sail counter-clockwise/clockwise (`sail/cmd_rate`) until released. X, Back, Y,
+Start and B set it to +90°, +45°, 0, −45° and −90° (`sail/cmd_angle`).
 
 | where the stick is | on the stick's machine | next to the robot |
 |---|---|---|
