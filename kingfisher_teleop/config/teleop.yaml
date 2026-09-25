@@ -1,0 +1,90 @@
+# joy_teleop for a Logitech F310 in XInput mode (switch on X). Check another
+# pad's indices with `ros2 topic echo /kingfisher/joy`.
+#
+#   axes:    0 left horiz.  1 left vert.  3 right horiz.  4 right vert.
+#            (2, 5 triggers; 6, 7 D-pad)
+#   buttons: 0 A  1 B  2 X  3 Y  4 LB  5 RB  6 Back  7 Start
+#
+# Hold LB (arcade) or RB (tank) to drive, never both: each publishes on its
+# own. Nothing is sent on release, so the MCU or cmd_drive_translate zeroes
+# the thrusters. Sail presets send once per press; rad, + is counter-clockwise
+# seen from above.
+
+/**/joy_teleop:
+  ros__parameters:
+
+    drive:
+      type: topic
+      interface_type: geometry_msgs/msg/Twist
+      topic_name: cmd_vel
+      deadman_buttons: [4]
+      axis_mappings:
+        linear-x:
+          axis: 1
+          scale: 1.0
+          offset: 0.0
+        angular-z:
+          axis: 3
+          scale: 1.0
+          offset: 0.0
+
+    tank:
+      type: topic
+      interface_type: kingfisher_msgs/msg/Drive
+      topic_name: cmd_drive
+      deadman_buttons: [5]
+      axis_mappings:
+        left:
+          axis: 1
+          scale: 1.0
+          offset: 0.0
+        right:
+          axis: 4
+          scale: 1.0
+          offset: 0.0
+
+    # X, Back, Y, Start, B: left to right across the pad
+    sail_plus_90:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_angle
+      deadman_buttons: [2]
+      message_value:
+        data:
+          value: 1.5708
+
+    sail_plus_45:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_angle
+      deadman_buttons: [6]
+      message_value:
+        data:
+          value: 0.7854
+
+    sail_zero:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_angle
+      deadman_buttons: [3]
+      message_value:
+        data:
+          value: 0.0
+
+    sail_minus_45:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_angle
+      deadman_buttons: [7]
+      message_value:
+        data:
+          value: -0.7854
+
+    sail_minus_90:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_angle
+      deadman_buttons: [1]
+      message_value:
+        data:
+          value: -1.5708
