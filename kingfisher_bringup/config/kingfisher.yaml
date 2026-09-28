@@ -28,4 +28,11 @@
 
 /**/kingfisher_viz:
   ros__parameters:
+    # static_tfs' frames until the bringup runs robot_state_publisher
     base_frame: "base_link"
+    left_thruster_frame: "thruster_left"
+    right_thruster_frame: "thruster_right"
+    # m per m/s of wind, m per N of sail force
+    wind_scale: 0.1
+    force_scale: 0.25
+    true_wind_origin: [0.0, 0.0, 1.2]

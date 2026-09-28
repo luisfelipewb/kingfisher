@@ -1,6 +1,12 @@
 /**:
   ros__parameters:
-    # Frame the thrust arrows are drawn in. Matches the boat's static TF tree
-    # (kingfisher_bringup/launch/static_tfs.launch) until the description
-    # lands in Stage B and robot_state_publisher takes over.
+    # Frames of the true-wind and thrust arrows: static_tfs' names on the
+    # boat until its bringup runs robot_state_publisher
     base_frame: "base_link"
+    left_thruster_frame: "thruster_left"
+    right_thruster_frame: "thruster_right"
+    # Arrow length: m per m/s of wind, m per N of sail force
+    wind_scale: 0.1
+    force_scale: 0.25
+    # Start of the true-wind arrow in base_frame, above the sail
+    true_wind_origin: [0.0, 0.0, 1.2]
