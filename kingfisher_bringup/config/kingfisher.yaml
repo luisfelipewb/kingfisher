@@ -29,3 +29,18 @@ wifi_monitor:
 kingfisher_viz:
   ros__parameters:
     base_frame: "base_link"
+
+sail_calibration:
+  ros__parameters:
+    # rad/s. Search for the switch and the moves to center / offset.
+    search_velocity: 2.0
+    # rad/s. The two passes that measure the switch edges.
+    measure_velocity: 0.2
+    # rad, true zero relative to the switch center (-pi/2).
+    # Sign depends on how the switch is mounted.
+    zero_offset: -1.5707963
+    # seconds between zeroing at the switch center and moving to the offset
+    offset_move_delay: 0.8
+    # rad, "arrived" threshold for the step moves
+    position_tolerance: 0.001
+    encoder_channel: 0
