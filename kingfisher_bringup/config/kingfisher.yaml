@@ -52,7 +52,7 @@ phidgets_high_speed_encoder:
     hub_port: 0
     frame_id: "encoder_link"
     # 2*pi / (14 * 300 * 4): 300 CPR, x4 quadrature, 14:1 reduction
-    joint0_tick2rad: 0.00037399912542735635
+    joint0_tick2rad: -0.00037399912542735635
 
 phidgets_stepper:
   ros__parameters:
@@ -66,7 +66,7 @@ phidgets_stepper:
     # rad/s^2 (rescaled units)
     acceleration: 10.0
     # (1/16 step per count) * (1.8 deg per step) / 14:1 reduction, in rad
-    rescale_factor: 0.00014024967203525864
+    rescale_factor: -0.00014024967203525864
 
 sail_calibration:
   ros__parameters:
@@ -76,7 +76,7 @@ sail_calibration:
     measure_velocity: 0.2
     # rad, true zero relative to the switch center (-pi/2).
     # Sign depends on how the switch is mounted.
-    zero_offset: -1.5707963
+    zero_offset: 1.5707963
     # seconds between zeroing at the switch center and moving to the offset
     offset_move_delay: 0.8
     # rad, "arrived" threshold for the step moves
