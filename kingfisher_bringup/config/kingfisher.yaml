@@ -29,6 +29,15 @@ kingfisher_viz:
   ros__parameters:
     base_frame: "base_link"
 
+joint_state_publisher:
+  ros__parameters:
+    # The encoder's sail_joint is the only measured joint. The propeller
+    # joints have no source and are published as 0.
+    source_list: ["sail/joint_states"]
+    # Hz. Also keeps sail_link TF fresh while the sail is still: the encoder
+    # only publishes on change.
+    rate: 20
+
 # Phidgets drivers, in the container in launch/robot.launch.py. All three reach the wired VINT
 # hub through the Phidget network server. The WiFi hub is "vint-wifi" at
 # 192.168.100.1. Repeated per node: the rcl YAML parser has no anchors, and a
@@ -50,7 +59,8 @@ phidgets_high_speed_encoder:
     server_ip: "192.168.1.20"
     is_hub_port_device: false
     hub_port: 0
-    frame_id: "encoder_link"
+    frame_id: "sail_motor_link"
+    joint0_name: "sail_joint"
     # 2*pi / (14 * 300 * 4): 300 CPR, x4 quadrature, 14:1 reduction
     joint0_tick2rad: -0.00037399912542735635
 

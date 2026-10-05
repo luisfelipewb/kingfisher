@@ -30,7 +30,8 @@ running a node on its own while debugging; those are not used in normal operatio
 
 `kingfisher_description` holds the boat's geometry. Link names are plain
 (`base_link`, `imu_link`, `lidar_link`, …); `robot_state_publisher` adds the
-`kingfisher/` prefix through `frame_prefix`. The simulation
+`kingfisher/` prefix through `frame_prefix` (in sim and `display.launch.py`;
+the boat runs without a prefix). The simulation
 ([`kingfisher_simulation`](https://github.com/luisfelipewb/kingfisher_simulation))
 builds on the same URDF, so the sim and the boat share one set of frames.
 
@@ -38,8 +39,13 @@ builds on the same URDF, so the sim and the boat share one set of frames.
 ros2 launch kingfisher_description display.launch.py   # RViz, no boat needed
 ```
 
-`robot.launch.py` still publishes the older frames from `static_tfs.launch.py`
-(`sbg`, `laser`, …). The switch to `robot_state_publisher` is pending.
+On the boat, `robot.launch.py` runs `robot_state_publisher` on this URDF.
+`joint_state_publisher` merges the sail encoder (`/sail/joint_states`) into
+`/joint_states` and sends the propeller joints as 0. The URDF replaced the
+ROS 1 static transforms, so bags recorded before the switch use the old
+frame names: `sbg` -> `imu_link`, `laser` -> `lidar_link`, `gps_aN` ->
+`gps_aN_link`, `thruster_<side>` -> `<side>_thruster_link`,
+`sail_encoder_link` -> `sail_motor_link` / `sail_link`.
 
 The package started from Clearpath's
 [kf/kingfisher](https://github.com/kf/kingfisher) @ `indigo-devel` `c7fb559`.
