@@ -1,23 +1,15 @@
-"""Top-level bringup for the real boat. Supersedes ros1/launch/robot.launch.
-
-Base plus sail calibration. Lidar and SBG localization land once
-ros-jazzy-lms1xx and ros-jazzy-sbg-driver are installed. ROS 1 gps.launch
-(u-blox) and imu.launch (UM6) are not ported; the SBG unit supersedes both.
-
-The Phidgets drivers the sail node talks to (stepper, high-speed encoder,
-digital inputs) are not launched here yet; they still come from
-sawasp/phidgets_launch.
+"""Top-level bringup for the real boat.
 """
 
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
 
 import launch_ros.actions
+import launch_ros.descriptions
 
 
 def generate_launch_description():
@@ -26,19 +18,42 @@ def generate_launch_description():
     config = os.path.join(bringup_share, 'config', 'kingfisher.yaml')
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'port', default_value='/dev/arduino',
-            description='Serial port for the Kingfisher MCU'),
-
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(bringup_launch, 'static_tfs.launch.py'))),
 
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(bringup_launch, 'base.launch.py')),
-            launch_arguments={'port': LaunchConfiguration('port')}.items()),
+            PythonLaunchDescriptionSource(os.path.join(bringup_launch, 'base.launch.py'))),
 
-        # Sail calibration. Idle until /sail_calibration/calibrate is called;
-        # needs the Phidgets drivers from sawasp/phidgets_launch to be up.
+        # Phidgets drivers on the VINT hub. They are components, so they
+        # share one container process.
+        launch_ros.actions.ComposableNodeContainer(
+            name='phidget_container', namespace='',
+            package='rclcpp_components', executable='component_container',
+            composable_node_descriptions=[
+                # sail magnet switch on /digital_input00
+                launch_ros.descriptions.ComposableNode(
+                    package='phidgets_digital_inputs',
+                    plugin='phidgets::DigitalInputsRosI',
+                    name='phidgets_digital_inputs',
+                    parameters=[config]),
+
+                # sail encoder
+                launch_ros.descriptions.ComposableNode(
+                    package='phidgets_high_speed_encoder',
+                    plugin='phidgets::HighSpeedEncoderRosI',
+                    name='phidgets_high_speed_encoder',
+                    parameters=[config]),
+
+                # sail stepper
+                launch_ros.descriptions.ComposableNode(
+                    package='phidgets_stepper',
+                    plugin='phidgets::StepperRosI',
+                    name='phidgets_stepper',
+                    parameters=[config]),
+            ],
+            output='screen'),
+
+        # Sail calibration. Idle until /sail_calibration/calibrate is called.
         launch_ros.actions.Node(
             package='kingfisher_sail', executable='kingfisher_sail',
             name='sail_calibration',

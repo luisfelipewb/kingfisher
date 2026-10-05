@@ -19,8 +19,8 @@ ros2 run kingfisher_sail kingfisher_sail
 ```
 
 Either way, the Phidgets drivers (stepper, high-speed encoder, digital inputs)
-must be up; they are launched from `sawasp/phidgets_launch`
-(`launch_all.launch.py` or `launch_all_wired.launch.py`).
+must be up. `kingfisher_bringup/robot.launch.py` starts them, with their
+parameters from `kingfisher.yaml`.
 
 ```bash
 ros2 topic echo /sail_calibration/status
@@ -81,8 +81,8 @@ and cancels in the average. That is what the clear step is for.
 - **`/digital_input00` is only published on change.** With the driver's
   `publish_rate` at 0 (as launched), a node started after the driver never
   sees the current switch state.
-- **Overshoot depends on the stepper acceleration**, which is set in the
-  Phidgets launch file. Slowing from `search_velocity` to `measure_velocity`
+- **Overshoot depends on the stepper acceleration**, `phidgets_stepper.acceleration`
+  in `kingfisher.yaml` (10.0 rad/s²). Slowing from `search_velocity` to `measure_velocity`
   At low acceleration, lower `search_velocity` if calibration takes too long.
 - **`zero_offset` is measured in the stepper's positive direction** from the
   switch center. Its sign depends on how the switch is mounted.

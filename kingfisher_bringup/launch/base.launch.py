@@ -9,8 +9,6 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 
 import launch_ros.actions
 
@@ -20,10 +18,6 @@ def generate_launch_description():
         get_package_share_directory('kingfisher_bringup'), 'config', 'kingfisher.yaml')
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'port', default_value='/dev/arduino',
-            description='Serial port for the Kingfisher MCU'),
-
         # MCU bridge. Topic names here come from the firmware (plan 5.1).
         # respawn was on the ROS 1 node and matters more now: serial_node.py
         # still has the unguarded crashes in plan 5.4 and opens the port in
@@ -31,7 +25,7 @@ def generate_launch_description():
         launch_ros.actions.Node(
             package='rosserial_python', executable='serial_node',
             name='kingfisher_serial',
-            parameters=[config, {'port': LaunchConfiguration('port')}],
+            parameters=[config],
             respawn=True, respawn_delay=2.0,
             output='screen'),
 

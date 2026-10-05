@@ -42,14 +42,13 @@ ros2 launch kingfisher_description display.launch.py   # RViz, no boat needed
 (`sbg`, `laser`, …). The switch to `robot_state_publisher` is pending.
 
 The package started from Clearpath's
-[kf/kingfisher](https://github.com/kf/kingfisher) @ `indigo-devel` `c7fb559`.## Calibrating the sail
+[kf/kingfisher](https://github.com/kf/kingfisher) @ `indigo-devel` `c7fb559`.
 
 ## Calibrating the sail
 
-`robot.launch.py` starts the `sail_calibration` node with its parameters from
-`kingfisher.yaml`. It sits idle until called. The Phidgets drivers it talks to
-(stepper, encoder, digital inputs) are not in bringup yet and are still
-launched from `sawasp/phidgets_launch`. With those drivers up:
+`robot.launch.py` starts the Phidgets drivers (sail stepper, sail encoder,
+switch input) and the `sail_calibration` node, all with their parameters from
+`kingfisher.yaml`. The node sits idle until called:
 
 ```bash
 ros2 service call /sail_calibration/calibrate std_srvs/srv/Trigger
@@ -57,6 +56,7 @@ ros2 service call /sail_calibration/calibrate std_srvs/srv/Trigger
 
 Progress is on `/sail_calibration/status`. See `kingfisher_sail/README.md`.
 
+The Phidgets container in `robot.launch.py` supersedes `sawasp/phidgets_launch`.
 
 ## Deliberately left on `noetic`
 

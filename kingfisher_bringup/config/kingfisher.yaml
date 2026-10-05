@@ -4,8 +4,7 @@
 
 kingfisher_serial:
   ros__parameters:
-    # /dev/arduino is the stable symlink from udev/10-arduino.rules.
-    # ttyACM0 renumbers on replug. Override with port:=
+    # /dev/arduino is the stable symlink from /etc/udev/rules.d/10-arduino.rules
     port: "/dev/arduino"
     baud: 57600
     timeout: 5.0
@@ -29,6 +28,45 @@ wifi_monitor:
 kingfisher_viz:
   ros__parameters:
     base_frame: "base_link"
+
+# Phidgets drivers, in the container in launch/robot.launch.py. All three reach the wired VINT
+# hub through the Phidget network server. The WiFi hub is "vint-wifi" at
+# 192.168.100.1. Repeated per node: the rcl YAML parser has no anchors, and a
+# /** block would apply to every node in this file.
+
+phidgets_digital_inputs:
+  ros__parameters:
+    server_name: "vint-wired"
+    server_ip: "192.168.1.20"
+    is_hub_port_device: false
+    hub_port: 1
+    # Leave publish_rate unset (0): the driver then publishes on every change.
+    # Any positive rate disables that, and sail_calibration times the switch
+    # edges from these messages.
+
+phidgets_high_speed_encoder:
+  ros__parameters:
+    server_name: "vint-wired"
+    server_ip: "192.168.1.20"
+    is_hub_port_device: false
+    hub_port: 0
+    frame_id: "encoder_link"
+    # 2*pi / (14 * 300 * 4): 300 CPR, x4 quadrature, 14:1 reduction
+    joint0_tick2rad: 0.00037399912542735635
+
+phidgets_stepper:
+  ros__parameters:
+    server_name: "vint-wired"
+    server_ip: "192.168.1.20"
+    is_hub_port_device: false
+    hub_port: 2
+    publish_rate: 2.0
+    current_limit: 1.0
+    holding_current_limit: 1.0
+    # rad/s^2 (rescaled units)
+    acceleration: 10.0
+    # (1/16 step per count) * (1.8 deg per step) / 14:1 reduction, in rad
+    rescale_factor: 0.00014024967203525864
 
 sail_calibration:
   ros__parameters:

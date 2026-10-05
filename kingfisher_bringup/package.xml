@@ -12,6 +12,10 @@
   <exec_depend>kingfisher_twist</exec_depend>
   <exec_depend>kingfisher_viz</exec_depend>
   <exec_depend>kingfisher_sail</exec_depend>
+  <exec_depend>rclcpp_components</exec_depend>
+  <exec_depend>phidgets_digital_inputs</exec_depend>
+  <exec_depend>phidgets_high_speed_encoder</exec_depend>
+  <exec_depend>phidgets_stepper</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
