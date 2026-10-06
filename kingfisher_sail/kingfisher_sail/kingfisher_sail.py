@@ -65,17 +65,17 @@ class SailCalibration(Node):
         self._position_tolerance = self.declare_parameter('position_tolerance', 1e-3).value
         self._encoder_channel = self.declare_parameter('encoder_channel', 0).value
 
-        self.create_subscription(Bool, '/digital_input00', self._switch_callback, 1)
-        self.create_subscription(JointState, '/phidgets_stepper/joint', self._joint_callback, 1)
+        self.create_subscription(Bool, 'digital_input00', self._switch_callback, 1)
+        self.create_subscription(JointState, 'phidgets_stepper/joint', self._joint_callback, 1)
         self.create_subscription(
-            StepperState, '/phidgets_stepper/state', self._stepper_callback, 10)
+            StepperState, 'phidgets_stepper/state', self._stepper_callback, 10)
 
-        self._command_pub = self.create_publisher(StepperCommand, '/phidgets_stepper/command', 1)
+        self._command_pub = self.create_publisher(StepperCommand, 'phidgets_stepper/command', 1)
         self._status_pub = self.create_publisher(String, '~/status', 10)
 
-        self._stepper_zero_client = self.create_client(Trigger, '/phidgets_stepper/zero')
+        self._stepper_zero_client = self.create_client(Trigger, 'phidgets_stepper/zero')
         self._encoder_zero_client = self.create_client(
-            ChannelTrigger, '/phidgets_high_speed_encoder/zero')
+            ChannelTrigger, 'phidgets_high_speed_encoder/zero')
 
         self.create_service(Trigger, '~/calibrate', self._calibrate_callback)
 

@@ -21,17 +21,26 @@ ROS 2 stack for the Kingfisher ASV.
 ros2 launch kingfisher_bringup robot.launch.py
 ```
 
+Like the sim (VRX), the boat runs under the `kingfisher` namespace: topics are
+`/kingfisher/cmd_vel`, `/kingfisher/joint_states`, … and frames are
+`kingfisher/base_link`, …. `/tf` and `/tf_static` stay global. Two launch
+arguments control this, `namespace` (default `kingfisher`) and `frame_prefix`
+(default `kingfisher/`); `namespace:=/ frame_prefix:=/` gives plain root
+topics and frames (`/` because `ros2 launch` rejects empty values; a leading
+`/` is stripped from `frame_prefix`).
+
 `kingfisher_bringup` is self-contained: it declares nodes directly against
 `kingfisher_bringup/config/kingfisher.yaml`. That one file is the boat's
-configuration. Each package also keeps its own `launch/` and `config/` for
+configuration. Its keys are `/**/<node name>` so they match in any namespace;
+a plain `<node name>` key would be silently ignored under `/kingfisher`. Each package also keeps its own `launch/` and `config/` for
 running a node on its own while debugging; those are not used in normal operation.
 
 ## Robot description
 
 `kingfisher_description` holds the boat's geometry. Link names are plain
 (`base_link`, `imu_link`, `lidar_link`, …); `robot_state_publisher` adds the
-`kingfisher/` prefix through `frame_prefix` (in sim and `display.launch.py`;
-the boat runs without a prefix). The simulation
+`kingfisher/` prefix through `frame_prefix`, on the boat (`robot.launch.py`)
+as in sim and `display.launch.py`. The simulation
 ([`kingfisher_simulation`](https://github.com/luisfelipewb/kingfisher_simulation))
 builds on the same URDF, so the sim and the boat share one set of frames.
 
@@ -40,8 +49,8 @@ ros2 launch kingfisher_description display.launch.py   # RViz, no boat needed
 ```
 
 On the boat, `robot.launch.py` runs `robot_state_publisher` on this URDF.
-`joint_state_publisher` merges the sail encoder (`/sail/joint_states`) into
-`/joint_states` and sends the propeller joints as 0. The URDF replaced the
+`joint_state_publisher` merges the sail encoder (`/kingfisher/sail/joint_states`)
+into `/kingfisher/joint_states` and sends the propeller joints as 0. The URDF replaced the
 ROS 1 static transforms, so bags recorded before the switch use the old
 frame names: `sbg` -> `imu_link`, `laser` -> `lidar_link`, `gps_aN` ->
 `gps_aN_link`, `thruster_<side>` -> `<side>_thruster_link`,
@@ -57,10 +66,10 @@ switch input) and the `sail_calibration` node, all with their parameters from
 `kingfisher.yaml`. The node sits idle until called:
 
 ```bash
-ros2 service call /sail_calibration/calibrate std_srvs/srv/Trigger
+ros2 service call /kingfisher/sail_calibration/calibrate std_srvs/srv/Trigger
 ```
 
-Progress is on `/sail_calibration/status`. See `kingfisher_sail/README.md`.
+Progress is on `/kingfisher/sail_calibration/status`. See `kingfisher_sail/README.md`.
 
 The Phidgets container in `robot.launch.py` supersedes `sawasp/phidgets_launch`.
 

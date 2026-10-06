@@ -20,11 +20,14 @@ ros2 run kingfisher_sail kingfisher_sail
 
 Either way, the Phidgets drivers (stepper, high-speed encoder, digital inputs)
 must be up. `kingfisher_bringup/robot.launch.py` starts them, with their
-parameters from `kingfisher.yaml`.
+parameters from `kingfisher.yaml`. Bringup runs everything under the
+`kingfisher` namespace, and the node's names are relative, so they follow
+whatever namespace it is started in (`ros2 run kingfisher_sail kingfisher_sail
+--ros-args -r __ns:=/kingfisher` to join the bringup drivers).
 
 ```bash
-ros2 topic echo /sail_calibration/status
-ros2 service call /sail_calibration/calibrate std_srvs/srv/Trigger
+ros2 topic echo /kingfisher/sail_calibration/status
+ros2 service call /kingfisher/sail_calibration/calibrate std_srvs/srv/Trigger
 ```
 
 The service answers immediately: `success: true` means the calibration has
@@ -54,16 +57,18 @@ and cancels in the average. That is what the clear step is for.
 
 ## Interface
 
+Names are relative to the node's namespace (`/kingfisher` under bringup).
+
 | | name | type |
 |---|---|---|
 | service | `~/calibrate` | `std_srvs/Trigger` |
 | pub | `~/status` | `std_msgs/String` |
-| pub | `/phidgets_stepper/command` | `phidgets_msgs/StepperCommand` |
-| sub | `/digital_input00` | `std_msgs/Bool` — `false` while on the switch |
-| sub | `/phidgets_stepper/joint` | `sensor_msgs/JointState` |
-| sub | `/phidgets_stepper/state` | `phidgets_msgs/StepperState` |
-| client | `/phidgets_stepper/zero` | `std_srvs/Trigger` |
-| client | `/phidgets_high_speed_encoder/zero` | `phidgets_msgs/Trigger` |
+| pub | `phidgets_stepper/command` | `phidgets_msgs/StepperCommand` |
+| sub | `digital_input00` | `std_msgs/Bool` — `false` while on the switch |
+| sub | `phidgets_stepper/joint` | `sensor_msgs/JointState` |
+| sub | `phidgets_stepper/state` | `phidgets_msgs/StepperState` |
+| client | `phidgets_stepper/zero` | `std_srvs/Trigger` |
+| client | `phidgets_high_speed_encoder/zero` | `phidgets_msgs/Trigger` |
 
 ## Parameters
 
@@ -78,7 +83,7 @@ and cancels in the average. That is what the clear step is for.
 
 ## Notes
 
-- **`/digital_input00` is only published on change.** With the driver's
+- **`digital_input00` is only published on change.** With the driver's
   `publish_rate` at 0 (as launched), a node started after the driver never
   sees the current switch state.
 - **Overshoot depends on the stepper acceleration**, `phidgets_stepper.acceleration`

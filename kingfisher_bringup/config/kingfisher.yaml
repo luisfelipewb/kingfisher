@@ -1,15 +1,20 @@
 # Boat configuration. Self-contained: bringup launches nodes directly and
 # does not include the per-package launch files, which stay in their own
 # packages for debugging.
+#
+# Keys are /**/<node name> so they match the node in any namespace (bringup
+# runs under /kingfisher by default). A bare <node name> key only matches a
+# node at the root, and anything else is silently ignored. Frame names here
+# are unprefixed; the launch files add frame_prefix where it is needed.
 
-kingfisher_serial:
+/**/kingfisher_serial:
   ros__parameters:
     # /dev/arduino is the stable symlink from /etc/udev/rules.d/10-arduino.rules
     port: "/dev/arduino"
     baud: 57600
     timeout: 5.0
 
-kingfisher_twist:
+/**/kingfisher_twist:
   ros__parameters:
     rotation_scale: 0.60
     fwd_speed_scale: 1.0
@@ -19,17 +24,18 @@ kingfisher_twist:
     # seconds at zero thrust before reversing sign
     dead_time: 0.25
 
-wifi_monitor:
+/**/wifi_monitor:
   ros__parameters:
     # MAC-derived name; changes if the dongle is swapped. Check `ip link`.
     dev: "wlx00c0ca91ebc1"
     hz: 1.0
 
-kingfisher_viz:
+/**/kingfisher_viz:
   ros__parameters:
+    # overridden in base.launch.py with frame_prefix
     base_frame: "base_link"
 
-joint_state_publisher:
+/**/joint_state_publisher:
   ros__parameters:
     # The encoder's sail_joint is the only measured joint. The propeller
     # joints have no source and are published as 0.
@@ -41,9 +47,10 @@ joint_state_publisher:
 # Phidgets drivers, in the container in launch/robot.launch.py. All three reach the wired VINT
 # hub through the Phidget network server. The WiFi hub is "vint-wifi" at
 # 192.168.100.1. Repeated per node: the rcl YAML parser has no anchors, and a
-# /** block would apply to every node in this file.
+# bare /** block would apply to every node in this file (/**/<name> only
+# matches that node).
 
-phidgets_digital_inputs:
+/**/phidgets_digital_inputs:
   ros__parameters:
     server_name: "vint-wired"
     server_ip: "192.168.1.20"
@@ -53,18 +60,19 @@ phidgets_digital_inputs:
     # Any positive rate disables that, and sail_calibration times the switch
     # edges from these messages.
 
-phidgets_high_speed_encoder:
+/**/phidgets_high_speed_encoder:
   ros__parameters:
     server_name: "vint-wired"
     server_ip: "192.168.1.20"
     is_hub_port_device: false
     hub_port: 0
+    # overridden in robot.launch.py with frame_prefix
     frame_id: "sail_motor_link"
     joint0_name: "sail_joint"
     # 2*pi / (14 * 300 * 4): 300 CPR, x4 quadrature, 14:1 reduction
     joint0_tick2rad: -0.00037399912542735635
 
-phidgets_stepper:
+/**/phidgets_stepper:
   ros__parameters:
     server_name: "vint-wired"
     server_ip: "192.168.1.20"
@@ -78,7 +86,7 @@ phidgets_stepper:
     # (1/16 step per count) * (1.8 deg per step) / 14:1 reduction, in rad
     rescale_factor: -0.00014024967203525864
 
-sail_calibration:
+/**/sail_calibration:
   ros__parameters:
     # rad/s. Search for the switch and the moves to center / offset.
     search_velocity: 2.0
