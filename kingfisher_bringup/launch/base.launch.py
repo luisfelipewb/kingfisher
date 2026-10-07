@@ -54,12 +54,16 @@ def generate_launch_description():
             respawn=True, respawn_delay=2.0,
             output='screen'),
 
-        # thrust arrows for RViz
+        # thrust and wind arrows for RViz
         launch_ros.actions.Node(
             package='kingfisher_viz', executable='kingfisher_viz_node',
             name='kingfisher_viz',
-            parameters=[config, {'base_frame': ParameterValue(
-                [frame_prefix, 'base_link'], value_type=str)}],
+            parameters=[config, {
+                param: ParameterValue([frame_prefix, frame], value_type=str)
+                for param, frame in (
+                    ('base_frame', 'base_link'),
+                    ('left_thruster_frame', 'left_thruster_link'),
+                    ('right_thruster_frame', 'right_thruster_link'))}],
             output='screen'),
     ]
 

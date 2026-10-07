@@ -34,6 +34,11 @@
   ros__parameters:
     # overridden in base.launch.py with frame_prefix
     base_frame: "base_link"
+    left_thruster_frame: "left_thruster_link"
+    right_thruster_frame: "right_thruster_link"
+    wind_scale: 0.1
+    force_scale: 0.25
+    true_wind_origin: [0.0, 0.0, 1.2]
 
 /**/joint_state_publisher:
   ros__parameters:

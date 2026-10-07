@@ -12,6 +12,7 @@ ROS 2 stack for the Kingfisher ASV.
 | `kingfisher_twist` | ament_python | `cmd_vel` → `cmd_drive` |
 | `kingfisher_viz` | ament_python | thrust arrows for RViz |
 | `wifi_monitor` | ament_python | `has_wifi` link liveness |
+| `kingfisher_teleop` | ament_cmake | joystick config for `joy` + `joy_teleop` |
 | `kingfisher_sail` | ament_python | sail calibration service, see its own README |
 | `kingfisher_bringup` | ament_python | what the boat actually runs |
 
@@ -34,6 +35,22 @@ topics and frames (`/` because `ros2 launch` rejects empty values; a leading
 configuration. Its keys are `/**/<node name>` so they match in any namespace;
 a plain `<node name>` key would be silently ignored under `/kingfisher`. Each package also keeps its own `launch/` and `config/` for
 running a node on its own while debugging; those are not used in normal operation.
+
+## Teleop
+
+`kingfisher_teleop` configures `joy` and `joy_teleop` for a Logitech F310 in XInput mode. Hold LB to
+drive through `cmd_vel` (left stick throttle, right stick turn), or RB for `cmd_drive` (one stick per
+thruster). Releasing either stops the stream, and the thrusters stop. With LB or RB held, D-pad
+left/right turns the sail counter-clockwise/clockwise (`sail/cmd_rate`) until released. X, Back, Y,
+Start and B set it to +90°, +45°, 0, −45° and −90° (`sail/cmd_angle`).
+
+| where the stick is | on the stick's machine | next to the robot |
+|---|---|---|
+| same machine | — | `ros2 launch kingfisher_teleop teleop.launch.py` |
+| laptop | `ros2 launch kingfisher_teleop joy.launch.py` | `ros2 launch kingfisher_teleop teleop.launch.py joy:=false` |
+
+Both default to the `kingfisher` namespace, like the boat and the sim. A laptop without this repo can run
+`ros2 run joy joy_node --ros-args -r __ns:=/kingfisher -p autorepeat_rate:=30.0 -p coalesce_interval_ms:=20`.
 
 ## Robot description
 

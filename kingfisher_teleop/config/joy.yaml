@@ -1,0 +1,12 @@
+# joy_node, on the machine the joystick is plugged into.
+/**/joy_node:
+  ros__parameters:
+    # First stick found; list them with `ros2 run joy joy_enumerate_devices`
+    device_id: 0
+    deadzone: 0.05
+    # Resend the last state while nothing changes. Gaps come out at 1-2x the
+    # period, so 30 Hz keeps a held deadman's cmd_drive above the MCU's 10 Hz.
+    autorepeat_rate: 30.0
+    # While a stick moves, publish at most every 20 ms (default 1 ms), which
+    # spares the MCU's 57600 baud link
+    coalesce_interval_ms: 20
