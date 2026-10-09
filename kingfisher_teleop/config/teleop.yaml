@@ -1,15 +1,22 @@
-# joy_teleop for a Logitech F310 in XInput mode (switch on X). Check another
-# pad's indices with `ros2 topic echo /kingfisher/joy`.
+# joy_teleop for a Logitech F310 in XInput mode (switch on X), read by joy's
+# game_controller_node, which uses SDL's standard layout, so the D-pad is buttons.
+# Check another pad's indices with `ros2 topic echo /kingfisher/joy`.
 #
-#   axes:    0 left horiz.  1 left vert.  3 right horiz.  4 right vert.
-#            6 D-pad horiz. (left +1)  (2, 5 triggers; 7 D-pad vert.)
-#   buttons: 0 A  1 B  2 X  3 Y  4 LB  5 RB  6 Back  7 Start
+#   axes:    0 left horiz.  1 left vert.  2 right horiz.  3 right vert.
+#            (left and up are +1; 4, 5 triggers)
+#   buttons: 0 A  1 B  2 X  3 Y  4 Back  5 Guide  6 Start  9 LB  10 RB
+#            11 D-pad up  12 down  13 left  14 right
 #
 # Hold LB (arcade) or RB (tank) to drive, never both: each publishes on its
 # own. Nothing is sent on release, so the MCU or cmd_drive_translate zeroes
-# the thrusters. Sail angles are rad, + counter-clockwise seen from above:
-# the D-pad turns the sail while LB or RB is held, and presets send once per
-# press.
+# the thrusters. Sail angles are rad, + counter-clockwise seen from above, and
+# go to kingfisher_sail's sail_controller, in sim and on the boat:
+# - LB + D-pad left/right turns the sail (sail/cmd_velocity). On release the
+#   stream stops, and sail_controller stops the sail after its velocity_timeout;
+# - RB + D-pad sends a position once per press (sail/cmd_position): up 0,
+#   down pi, left +pi/2, right -pi/2, and the diagonals in between (up-left
+#   +pi/4, up-right -pi/4, down-left +3pi/4, down-right -3pi/4);
+# - Back + Start calibrates the sail (sail/calibrate), once per press.
 
 /**/joy_teleop:
   ros__parameters:
@@ -18,14 +25,14 @@
       type: topic
       interface_type: geometry_msgs/msg/Twist
       topic_name: cmd_vel
-      deadman_buttons: [4]
+      deadman_buttons: [9]
       axis_mappings:
         linear-x:
           axis: 1
           scale: 1.0
           offset: 0.0
         angular-z:
-          axis: 3
+          axis: 2
           scale: 1.0
           offset: 0.0
 
@@ -33,83 +40,120 @@
       type: topic
       interface_type: kingfisher_msgs/msg/Drive
       topic_name: cmd_drive
-      deadman_buttons: [5]
+      deadman_buttons: [10]
       axis_mappings:
         left:
           axis: 1
           scale: 1.0
           offset: 0.0
         right:
-          axis: 4
+          axis: 3
           scale: 1.0
           offset: 0.0
 
-    # D-pad left/right: sail/cmd_rate in rad/s, which sail_jog clamps to its
-    # max_rate. One entry per deadman; joy_teleop ANDs the buttons in a list.
-    sail_turn_lb:
+    # LB + D-pad left/right: sail/cmd_velocity in rad/s, sail_controller's
+    # max_velocity. Streams while both are held; joy_teleop ANDs the buttons.
+    sail_turn_left:
       type: topic
       interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_rate
-      deadman_buttons: [4]
+      topic_name: sail/cmd_velocity
+      deadman_buttons: [9, 13]
       axis_mappings:
         data:
-          axis: 6
-          scale: 1.0
+          button: 13
+          scale: 2.0
           offset: 0.0
 
-    sail_turn_rb:
+    sail_turn_right:
       type: topic
       interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_rate
-      deadman_buttons: [5]
+      topic_name: sail/cmd_velocity
+      deadman_buttons: [9, 14]
       axis_mappings:
         data:
-          axis: 6
-          scale: 1.0
+          button: 14
+          scale: -2.0
           offset: 0.0
 
-    # X, Back, Y, Start, B: left to right across the pad
-    sail_plus_90:
+    # RB + D-pad: sail/cmd_position, sent once per press. A diagonal also
+    # activates its two arrows, which publish too. joy_teleop runs commands in
+    # name order, so the diagonal_* entries come after cardinal_* and win.
+    sail_cardinal_up:
       type: topic
       interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_angle
-      deadman_buttons: [2]
-      message_value:
-        data:
-          value: 1.5708
-
-    sail_plus_45:
-      type: topic
-      interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_angle
-      deadman_buttons: [6]
-      message_value:
-        data:
-          value: 0.7854
-
-    sail_zero:
-      type: topic
-      interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_angle
-      deadman_buttons: [3]
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 11]
       message_value:
         data:
           value: 0.0
 
-    sail_minus_45:
+    sail_cardinal_down:
       type: topic
       interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_angle
-      deadman_buttons: [7]
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 12]
+      message_value:
+        data:
+          value: 3.14159
+
+    sail_cardinal_left:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 13]
+      message_value:
+        data:
+          value: 1.5708
+
+    sail_cardinal_right:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 14]
+      message_value:
+        data:
+          value: -1.5708
+
+    sail_diagonal_up_left:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 11, 13]
+      message_value:
+        data:
+          value: 0.7854
+
+    sail_diagonal_up_right:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 11, 14]
       message_value:
         data:
           value: -0.7854
 
-    sail_minus_90:
+    sail_diagonal_down_left:
       type: topic
       interface_type: std_msgs/msg/Float64
-      topic_name: sail/cmd_angle
-      deadman_buttons: [1]
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 12, 13]
       message_value:
         data:
-          value: -1.5708
+          value: 2.3562
+
+    sail_diagonal_down_right:
+      type: topic
+      interface_type: std_msgs/msg/Float64
+      topic_name: sail/cmd_position
+      deadman_buttons: [10, 12, 14]
+      message_value:
+        data:
+          value: -2.3562
+
+    # Back + Start: run the sail calibration (boat only). Service entries take
+    # `buttons`, not `deadman_buttons`.
+    sail_calibrate:
+      type: service
+      interface_type: std_srvs/srv/Trigger
+      service_name: sail/calibrate
+      buttons: [4, 6]

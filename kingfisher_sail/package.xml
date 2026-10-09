@@ -3,7 +3,7 @@
 <package format="3">
   <name>kingfisher_sail</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Sail command interface and calibration</description>
   <maintainer email="luis.batista@gatech.edu">kingfisher</maintainer>
   <license>TODO: License declaration</license>
 

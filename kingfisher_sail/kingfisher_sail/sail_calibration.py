@@ -1,9 +1,10 @@
 """
 Sail calibration node.
 
-Exposes a ``~/calibrate`` service (std_srvs/Trigger) that locates the magnet switch, moves
-the sail to the true zero and zeroes both the stepper and the encoder. Progress is published
-as plain text on ``~/status``.
+Exposes a ``sail/calibrate`` service (std_srvs/Trigger) that locates the magnet switch, moves
+the sail to the true zero and zeroes both the stepper and the encoder. ``sail/calibrated``
+(std_msgs/Bool, latched) is false from startup and during a calibration, and true after a
+successful one; sail_controller only commands the stepper while it is true. Progress is logged.
 
 Calibration sequence:
     1. Search: run fast in the positive direction until the switch is reached
@@ -17,7 +18,7 @@ Calibration sequence:
     5. Center: step to (p1 + p2) / 2 and zero the stepper and the encoder there.
     6. Offset: wait offset_move_delay, step to zero_offset and zero both again
        (skipped when zero_offset is 0).
-    7. Disengage the stepper.
+    7. Hold there, engaged.
 """
 
 from enum import auto, Enum
@@ -28,8 +29,9 @@ from phidgets_msgs.srv import Trigger as ChannelTrigger
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool
 from std_srvs.srv import Trigger
 
 
@@ -71,13 +73,15 @@ class SailCalibration(Node):
             StepperState, 'phidgets_stepper/state', self._stepper_callback, 10)
 
         self._command_pub = self.create_publisher(StepperCommand, 'phidgets_stepper/command', 1)
-        self._status_pub = self.create_publisher(String, '~/status', 10)
+        self._calibrated_pub = self.create_publisher(
+            Bool, 'sail/calibrated',
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 
         self._stepper_zero_client = self.create_client(Trigger, 'phidgets_stepper/zero')
         self._encoder_zero_client = self.create_client(
             ChannelTrigger, 'phidgets_high_speed_encoder/zero')
 
-        self.create_service(Trigger, '~/calibrate', self._calibrate_callback)
+        self.create_service(Trigger, 'sail/calibrate', self._calibrate_callback)
 
         self._state = CalibrationState.IDLE
         self._last_joint = None
@@ -92,6 +96,7 @@ class SailCalibration(Node):
         self._target = None
         self._zero_futures = []
         self._offset_timer = None
+        self._calibrated_pub.publish(Bool(data=False))
 
     # ---------------------------------------------------------------- service
 
@@ -103,13 +108,15 @@ class SailCalibration(Node):
 
         error = self._check_ready()
         if error:
-            self._publish_status(f'Calibration not started: {error}')
+            self.get_logger().warn(f'Calibration not started: {error}')
             response.success = False
             response.message = error
             return response
 
         self._p1 = self._p2 = self._center = self._target = None
-        self._publish_status('Calibration started')
+        # Before the first stepper command, so that sail_controller stops commanding
+        self._calibrated_pub.publish(Bool(data=False))
+        self.get_logger().info('Calibration started')
         if self._on_switch:
             self._start_clearing('Already on the switch')
         else:
@@ -123,11 +130,11 @@ class SailCalibration(Node):
     def _check_ready(self):
         """Return an error message if calibration cannot start, else None."""
         if self._last_joint is None:
-            return 'No joint state received on /phidgets_stepper/joint'
+            return 'No joint state received on phidgets_stepper/joint'
         if not self._stepper_zero_client.service_is_ready():
-            return 'Service /phidgets_stepper/zero not available'
+            return 'Service phidgets_stepper/zero not available'
         if not self._encoder_zero_client.service_is_ready():
-            return 'Service /phidgets_high_speed_encoder/zero not available'
+            return 'Service phidgets_high_speed_encoder/zero not available'
         return None
 
     # ------------------------------------------------------- sensor callbacks
@@ -234,7 +241,7 @@ class SailCalibration(Node):
         self._zero_futures = []
 
         if errors:
-            self._finish('Calibration failed: ' + '; '.join(errors))
+            self._finish('Calibration failed: ' + '; '.join(errors), success=False)
         elif self._state == CalibrationState.ZEROING_CENTER and self._zero_offset != 0.0:
             self._offset_timer = self.create_timer(
                 self._offset_move_delay, self._offset_timer_callback)
@@ -242,7 +249,7 @@ class SailCalibration(Node):
                 CalibrationState.WAITING_BEFORE_OFFSET_MOVE,
                 f'Zeroed at switch center, moving to offset in {self._offset_move_delay}s')
         else:
-            self._finish('Calibration complete')
+            self._finish('Calibration complete', success=True)
 
     def _offset_timer_callback(self):
         self.destroy_timer(self._offset_timer)
@@ -252,19 +259,16 @@ class SailCalibration(Node):
             CalibrationState.MOVING_TO_OFFSET, self._zero_offset,
             f'Moving to offset={self._zero_offset:.4f}')
 
-    def _finish(self, message):
-        self._disengage()
+    def _finish(self, message, success):
+        # The stepper stays engaged and holds where the last step move left it
         self._set_state(CalibrationState.IDLE, message)
+        self._calibrated_pub.publish(Bool(data=success))
 
     # ---------------------------------------------------------------- helpers
 
     def _set_state(self, state, message):
         self._state = state
-        self._publish_status(message)
-
-    def _publish_status(self, message):
         self.get_logger().info(message)
-        self._status_pub.publish(String(data=message))
 
     def _joint_position(self):
         return self._last_joint.position[0]
@@ -281,9 +285,6 @@ class SailCalibration(Node):
 
     def _step_to(self, position, velocity):
         self._send_command(StepperCommand.CONTROL_MODE_STEP, target=position, velocity=velocity)
-
-    def _disengage(self):
-        self._send_command(StepperCommand.CONTROL_MODE_DISENGAGED)
 
 
 def main(args=None):

@@ -105,3 +105,14 @@
     # rad, "arrived" threshold for the step moves
     position_tolerance: 0.001
     encoder_channel: 0
+
+# Also run in sim by kingfisher_sim, against its stepper stand-in
+/**/sail_controller:
+  ros__parameters:
+    # rad/s. STEP velocity limit and RUN clamp.
+    max_velocity: 2.0
+    # seconds without sail/cmd_velocity before a jog stops
+    velocity_timeout: 0.25
+    # seconds after the last non-zero sail/cmd_velocity during which
+    # sail/cmd_position is ignored
+    position_holdoff: 1.0

@@ -1,4 +1,4 @@
-"""joy_teleop, next to the robot, plus joy_node unless joy:=false.
+"""joy_teleop, next to the robot, plus game_controller_node unless joy:=false.
 
 With the stick on another machine, run joy.launch.py there and this with
 joy:=false here.
@@ -26,7 +26,7 @@ def generate_launch_description():
             description='Robot namespace; namespace:=/ for the root namespace'),
         DeclareLaunchArgument(
             'joy', default_value='true',
-            description='Also start joy_node; false when the stick is on another machine'),
+            description='Also start game_controller_node; false when the stick is on another machine'),
         DeclareLaunchArgument(
             'teleop_config', default_value=os.path.join(pkg, 'config', 'teleop.yaml'),
             description='Parameter file for joy_teleop'),

@@ -13,7 +13,7 @@ ROS 2 stack for the Kingfisher ASV.
 | `kingfisher_viz` | ament_python | thrust arrows for RViz |
 | `wifi_monitor` | ament_python | `has_wifi` link liveness |
 | `kingfisher_teleop` | ament_cmake | joystick config for `joy` + `joy_teleop` |
-| `kingfisher_sail` | ament_python | sail calibration service, see its own README |
+| `kingfisher_sail` | ament_python | sail command interface and calibration, see its own README |
 | `kingfisher_bringup` | ament_python | what the boat actually runs |
 
 ## Running the boat
@@ -38,11 +38,12 @@ running a node on its own while debugging; those are not used in normal operatio
 
 ## Teleop
 
-`kingfisher_teleop` configures `joy` and `joy_teleop` for a Logitech F310 in XInput mode. Hold LB to
-drive through `cmd_vel` (left stick throttle, right stick turn), or RB for `cmd_drive` (one stick per
-thruster). Releasing either stops the stream, and the thrusters stop. With LB or RB held, D-pad
-left/right turns the sail counter-clockwise/clockwise (`sail/cmd_rate`) until released. X, Back, Y,
-Start and B set it to +90°, +45°, 0, −45° and −90° (`sail/cmd_angle`).
+`kingfisher_teleop` configures `joy`'s `game_controller_node` and `joy_teleop` for a Logitech F310 in
+XInput mode. Hold LB to drive through `cmd_vel` (left stick throttle, right stick turn), or RB for
+`cmd_drive` (one stick per thruster). Releasing either stops the stream, and the thrusters stop. The sail:
+- LB + D-pad left/right turns it counter-clockwise/clockwise (`sail/cmd_velocity`) until released;
+- RB + D-pad up, down, left, right sets it to 0, 180°, +90°, −90° (`sail/cmd_position`);
+- Back + Start calibrates it (`sail/calibrate`).
 
 | where the stick is | on the stick's machine | next to the robot |
 |---|---|---|
@@ -50,7 +51,7 @@ Start and B set it to +90°, +45°, 0, −45° and −90° (`sail/cmd_angle`).
 | laptop | `ros2 launch kingfisher_teleop joy.launch.py` | `ros2 launch kingfisher_teleop teleop.launch.py joy:=false` |
 
 Both default to the `kingfisher` namespace, like the boat and the sim. A laptop without this repo can run
-`ros2 run joy joy_node --ros-args -r __ns:=/kingfisher -p autorepeat_rate:=30.0 -p coalesce_interval_ms:=20`.
+`ros2 run joy game_controller_node --ros-args -r __ns:=/kingfisher -p autorepeat_rate:=30.0 -p coalesce_interval_ms:=20`.
 
 ## Robot description
 
@@ -76,17 +77,19 @@ frame names: `sbg` -> `imu_link`, `laser` -> `lidar_link`, `gps_aN` ->
 The package started from Clearpath's
 [kf/kingfisher](https://github.com/kf/kingfisher) @ `indigo-devel` `c7fb559`.
 
-## Calibrating the sail
+## The sail
 
 `robot.launch.py` starts the Phidgets drivers (sail stepper, sail encoder,
-switch input) and the `sail_calibration` node, all with their parameters from
-`kingfisher.yaml`. The node sits idle until called:
+switch input) and `kingfisher_sail`'s `sail_calibration` and `sail_controller`,
+all with their parameters from `kingfisher.yaml`. Commands
+(`sail/cmd_position`, `sail/cmd_velocity`) are ignored until the sail is
+calibrated, once after every start:
 
 ```bash
-ros2 service call /kingfisher/sail_calibration/calibrate std_srvs/srv/Trigger
+ros2 service call /kingfisher/sail/calibrate std_srvs/srv/Trigger
 ```
 
-Progress is on `/kingfisher/sail_calibration/status`. See `kingfisher_sail/README.md`.
+`/kingfisher/sail/calibrated` turns `true` when it is done. See `kingfisher_sail/README.md`.
 
 The Phidgets container in `robot.launch.py` supersedes `sawasp/phidgets_launch`.
 

@@ -1,4 +1,4 @@
-"""joy_node alone, for the machine the joystick is plugged into."""
+"""game_controller_node alone, for the machine the joystick is plugged into."""
 
 import os
 
@@ -19,8 +19,8 @@ def generate_launch_description():
             description='Robot namespace; namespace:=/ for the root namespace'),
 
         launch_ros.actions.Node(
-            package='joy', executable='joy_node',
-            name='joy_node',
+            package='joy', executable='game_controller_node',
+            name='game_controller_node',
             namespace=LaunchConfiguration('namespace'),
             parameters=[config],
             output='screen'),

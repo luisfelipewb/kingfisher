@@ -74,10 +74,15 @@ def generate_launch_description():
             ],
             output='screen'),
 
-        # Sail calibration. Idle until sail_calibration/calibrate is called.
+        # Sail calibration. Idle until sail/calibrate is called.
         launch_ros.actions.Node(
-            package='kingfisher_sail', executable='kingfisher_sail',
-            name='sail_calibration',
+            package='kingfisher_sail', executable='sail_calibration',
+            parameters=[config],
+            output='screen'),
+
+        # sail/cmd_position and sail/cmd_velocity -> stepper, once calibrated
+        launch_ros.actions.Node(
+            package='kingfisher_sail', executable='sail_controller',
             parameters=[config],
             output='screen'),
     ]
