@@ -14,6 +14,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 
 import launch_ros.actions
@@ -24,6 +25,8 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('kingfisher_bringup'), 'config', 'kingfisher.yaml')
+    teleop_config = os.path.join(
+        get_package_share_directory('kingfisher_teleop'), 'config', 'teleop.yaml')
     # Leading '/' stripped, as in robot.launch.py: frame_prefix:=/ means no prefix.
     frame_prefix = PythonExpression(["'", LaunchConfiguration('frame_prefix'), "'.lstrip('/')"])
 
@@ -65,6 +68,15 @@ def generate_launch_description():
                     ('left_thruster_frame', 'left_thruster_link'),
                     ('right_thruster_frame', 'right_thruster_link'))}],
             output='screen'),
+
+        # joy -> cmd_vel, cmd_drive, sail commands. The joystick node
+        # (kingfisher_teleop joy.launch.py) runs on the machine with the pad.
+        launch_ros.actions.Node(
+            package='joy_teleop', executable='joy_teleop',
+            name='joy_teleop',
+            parameters=[teleop_config],
+            condition=IfCondition(LaunchConfiguration('teleop')),
+            output='screen'),
     ]
 
     return LaunchDescription([
@@ -74,5 +86,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'frame_prefix', default_value='kingfisher/',
             description='prefix for the TF frames the boat nodes stamp'),
+        DeclareLaunchArgument(
+            'teleop', default_value='true',
+            description='Start joy_teleop for a joystick on another machine'),
         GroupAction([PushRosNamespace(LaunchConfiguration('namespace')), *nodes]),
     ])

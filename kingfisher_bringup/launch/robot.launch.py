@@ -94,6 +94,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'frame_prefix', default_value='kingfisher/',
             description='prefix for the TF frames (robot_state_publisher and node frame_ids)'),
+        DeclareLaunchArgument(
+            'teleop', default_value='true',
+            description='Start joy_teleop for a joystick on another machine'),
 
         GroupAction([PushRosNamespace(namespace), *nodes]),
 
@@ -104,5 +107,6 @@ def generate_launch_description():
             launch_arguments={
                 'namespace': namespace,
                 'frame_prefix': LaunchConfiguration('frame_prefix'),
+                'teleop': LaunchConfiguration('teleop'),
             }.items()),
     ])
