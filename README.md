@@ -42,14 +42,19 @@ running a node on its own while debugging; those are not used in normal operatio
 XInput mode. Hold LB to drive through `cmd_vel` (left stick throttle, right stick turn), or RB for
 `cmd_drive` (one stick per thruster). Releasing either stops the stream, and the thrusters stop. The sail:
 - LB + D-pad left/right turns it counter-clockwise/clockwise (`sail/cmd_velocity`) until released;
-- RB + D-pad up, down, left, right sets it to 0, 180°, +90°, −90° (`sail/cmd_position`);
+- RB + D-pad up, down, left, right sets it to 0, 180°, +90°, −90° (`sail/cmd_position`), and two
+  arrows set the diagonals;
 - Back + Start calibrates it (`sail/calibrate`).
 
-| where the stick is | on the stick's machine | next to the robot |
-|---|---|---|
-| same machine | — | `ros2 launch kingfisher_teleop teleop.launch.py` |
-| laptop | `ros2 launch kingfisher_teleop joy.launch.py` | `ros2 launch kingfisher_teleop teleop.launch.py joy:=false` |
+`robot.launch.py` (and the sim) already starts `joy_teleop` (arg `teleop`, default true), so only the
+joystick node is needed, on the machine with the pad:
 
+```bash
+ros2 launch kingfisher_teleop joy.launch.py
+```
+
+With `teleop:=false`, run `teleop.launch.py` next to the robot instead (`joy:=false` if the pad is on
+another machine). Never run it beside a bringup that starts `joy_teleop`, or every command is doubled.
 Both default to the `kingfisher` namespace, like the boat and the sim. A laptop without this repo can run
 `ros2 run joy game_controller_node --ros-args -r __ns:=/kingfisher -p autorepeat_rate:=30.0 -p coalesce_interval_ms:=20`.
 

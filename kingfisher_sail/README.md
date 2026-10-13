@@ -15,8 +15,8 @@ it was started.
 
 On the boat, `kingfisher_bringup/robot.launch.py` starts both nodes and the Phidgets drivers (stepper,
 high-speed encoder, digital inputs) under `/kingfisher`, with parameters from
-`kingfisher_bringup/config/kingfisher.yaml`. The defaults in the nodes match that file. Names are
-relative, so to run a node on its own, join the bringup namespace:
+`kingfisher_bringup/config/kingfisher.yaml`.
+Names are relative, so to run a node on its own, join the bringup namespace:
 
 ```bash
 ros2 run kingfisher_sail sail_controller --ros-args -r __ns:=/kingfisher
