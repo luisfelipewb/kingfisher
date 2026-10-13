@@ -86,10 +86,10 @@ def generate_launch_description():
             parameters=[config],
             output='screen'),
 
-        # Anemometer (sawasp's rowind7): the apparent wind in base_link, where it goes
+        # Anemometer (nmea_wind_driver): the apparent wind in base_link, where it goes
         launch_ros.actions.Node(
-            package='rowind7', executable='rowind7_node',
-            name='rowind7',
+            package='nmea_wind_driver', executable='nmea_wind_node',
+            name='anemometer',
             parameters=[config, {
                 param: ParameterValue([frame_prefix, frame], value_type=str)
                 for param, frame in (

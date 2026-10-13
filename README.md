@@ -95,7 +95,7 @@ The Phidgets container in `robot.launch.py` supersedes `sawasp/phidgets_launch`.
 
 ## The anemometer
 
-`robot.launch.py` runs the Rowind 7 driver, `rowind7` from the
+`robot.launch.py` runs the anemometer (an LCJ CV7) with `nmea_wind_driver`, hosted as Cédric's
 [sawasp](https://optimav.georgiatech-metz.fr/cedricpradalier/sawasp) repo, which must be in the
 workspace too. It publishes `/kingfisher/sensors/anemometer/wind` (`Vector3Stamped`, m/s): the
 apparent wind in `kingfisher/base_link`, pointing where the wind goes, unfiltered, about 1.9 Hz. The
