@@ -83,6 +83,8 @@
     joint0_name: "sail_joint"
     # 2*pi / (14 * 300 * 4): 300 CPR, x4 quadrature, 14:1 reduction
     joint0_tick2rad: -0.00037399912542735635
+    # 0 stops joint_states_ch0_decim_speed (unused)
+    speed_filter_samples_len: 0
 
 /**/phidgets_stepper:
   ros__parameters:

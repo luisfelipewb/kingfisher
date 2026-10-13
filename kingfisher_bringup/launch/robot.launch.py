@@ -54,7 +54,10 @@ def generate_launch_description():
                     package='phidgets_digital_inputs',
                     plugin='phidgets::DigitalInputsRosI',
                     name='phidgets_digital_inputs',
-                    parameters=[config]),
+                    parameters=[config],
+                    # hide the unused inputs (leading _ keeps them out of topic list)
+                    remappings=[(f'digital_input0{i}', f'_unused/digital_input0{i}')
+                                for i in (1, 2, 3)]),
 
                 # sail encoder
                 launch_ros.descriptions.ComposableNode(
@@ -63,7 +66,9 @@ def generate_launch_description():
                     name='phidgets_high_speed_encoder',
                     parameters=[config, {'frame_id': ParameterValue(
                         [frame_prefix, 'sail_motor_link'], value_type=str)}],
-                    remappings=[('joint_states', 'sail/joint_states')]),
+                    remappings=[
+                        ('joint_states', 'sail/joint_states'),
+                        ('joint_states_ch0_decim_speed', '_unused/joint_states_ch0_decim_speed')]),
 
                 # sail stepper
                 launch_ros.descriptions.ComposableNode(
