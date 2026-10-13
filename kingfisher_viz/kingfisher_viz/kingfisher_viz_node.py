@@ -57,8 +57,9 @@ class KingfisherViz(Node):
         # m per m/s, and m per N
         self.wind_scale = self.declare_parameter('wind_scale', 0.1).value
         self.force_scale = self.declare_parameter('force_scale', 0.25).value
-        self.true_wind_origin = list(
-            self.declare_parameter('true_wind_origin', [0.0, 0.0, 1.2]).value)
+        # Start of both wind arrows, so they compare at a glance
+        self.wind_origin = list(
+            self.declare_parameter('wind_origin', [0.0, 0.0, 1.2]).value)
 
         # Cached for the true wind
         self.wind_direction = None
@@ -99,10 +100,11 @@ class KingfisherViz(Node):
                 self.thrust_arrow(Header(stamp=stamp, frame_id=right), 1, msg.right, GREEN)]
 
     def apparent_wind_markers(self, msg):
+        # In the message's frame, base_link by the anemometer contract
         v = msg.vector
-        s = self.wind_scale
-        end = (s * v.x, s * v.y, s * v.z)
-        return [self.arrow(msg.header, 'kf_wind', 0, (0.0, 0.0, 0.0), end, CYAN)]
+        start = self.wind_origin
+        end = [start[i] + self.wind_scale * c for i, c in enumerate((v.x, v.y, v.z))]
+        return [self.arrow(msg.header, 'kf_wind', 0, start, end, CYAN)]
 
     def true_wind_markers(self, msg):
         # Where the wind goes, ENU degrees; rotated into base_frame by the ground truth
@@ -111,7 +113,7 @@ class KingfisherViz(Node):
         theta = math.radians(self.wind_direction)
         world = (msg.data * math.cos(theta), msg.data * math.sin(theta), 0.0)
         wind = rotate_into(self.orientation, world)
-        start = self.true_wind_origin
+        start = self.wind_origin
         end = [start[i] + self.wind_scale * wind[i] for i in range(3)]
         header = Header(stamp=self.get_clock().now().to_msg(), frame_id=self.base_frame)
         return [self.arrow(header, 'kf_wind', 1, start, end, BLUE)]

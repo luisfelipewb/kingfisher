@@ -7,5 +7,5 @@
     # Arrow length: m per m/s of wind, m per N of sail force
     wind_scale: 0.1
     force_scale: 0.25
-    # Start of the true-wind arrow in base_frame, above the sail
-    true_wind_origin: [0.0, 0.0, 1.2]
+    # Start of the true and apparent wind arrows in base_frame, above the sail
+    wind_origin: [0.0, 0.0, 1.2]

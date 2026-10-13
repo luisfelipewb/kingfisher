@@ -85,6 +85,19 @@ def generate_launch_description():
             package='kingfisher_sail', executable='sail_controller',
             parameters=[config],
             output='screen'),
+
+        # Anemometer (sawasp's rowind7): the apparent wind in base_link, where it goes
+        launch_ros.actions.Node(
+            package='rowind7', executable='rowind7_node',
+            name='rowind7',
+            parameters=[config, {
+                param: ParameterValue([frame_prefix, frame], value_type=str)
+                for param, frame in (
+                    ('frame_id', 'anemometer_link'),
+                    ('target_frame', 'base_link'))}],
+            remappings=[('wind', 'sensors/anemometer/wind')],
+            respawn=True, respawn_delay=2.0,
+            output='screen'),
     ]
 
     return LaunchDescription([

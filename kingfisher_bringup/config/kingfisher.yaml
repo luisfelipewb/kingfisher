@@ -38,7 +38,14 @@
     right_thruster_frame: "right_thruster_link"
     wind_scale: 0.1
     force_scale: 0.25
-    true_wind_origin: [0.0, 0.0, 1.2]
+    wind_origin: [0.0, 0.0, 1.2]
+
+/**/rowind7:
+  ros__parameters:
+    # /dev/anemometer is the boat's udev symlink to the Rowind's FTDI adapter
+    port: "/dev/anemometer"
+    baudrate: 4800
+    # frame_id and target_frame are set in robot.launch.py with frame_prefix
 
 /**/joint_state_publisher:
   ros__parameters:

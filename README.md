@@ -10,7 +10,7 @@ ROS 2 stack for the Kingfisher ASV.
 | `kingfisher_description` | ament_cmake | URDF/xacro and meshes, no Gazebo |
 | `kingfisher_rosserial` | — | the MCU bridge, see its own README |
 | `kingfisher_twist` | ament_python | `cmd_vel` → `cmd_drive` |
-| `kingfisher_viz` | ament_python | thrust arrows for RViz |
+| `kingfisher_viz` | ament_python | thrust, wind and sail arrows for RViz |
 | `wifi_monitor` | ament_python | `has_wifi` link liveness |
 | `kingfisher_teleop` | ament_cmake | joystick config for `joy` + `joy_teleop` |
 | `kingfisher_sail` | ament_python | sail command interface and calibration, see its own README |
@@ -92,6 +92,14 @@ ros2 service call /kingfisher/sail/calibrate std_srvs/srv/Trigger
 `/kingfisher/sail/calibrated` turns `true` when it is done. See `kingfisher_sail/README.md`.
 
 The Phidgets container in `robot.launch.py` supersedes `sawasp/phidgets_launch`.
+
+## The anemometer
+
+`robot.launch.py` runs the Rowind 7 driver, `rowind7` from the
+[sawasp](https://optimav.georgiatech-metz.fr/cedricpradalier/sawasp) repo, which must be in the
+workspace too. It publishes `/kingfisher/sensors/anemometer/wind` (`Vector3Stamped`, m/s): the
+apparent wind in `kingfisher/base_link`, pointing where the wind goes, unfiltered, about 1.9 Hz. The
+sim publishes the same topic. `kingfisher_viz` draws it.
 
 ## Deliberately left on `noetic`
 
