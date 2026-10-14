@@ -14,6 +14,7 @@ ROS 2 stack for the Kingfisher ASV.
 | `wifi_monitor` | ament_python | `has_wifi` link liveness |
 | `kingfisher_teleop` | ament_cmake | joystick config for `joy` + `joy_teleop` |
 | `kingfisher_sail` | ament_python | sail command interface and calibration, see its own README |
+| `kingfisher_localization` | ament_python | SBG driver, `odom`, IMU and GPS on the VRX topics, site frames, see its own README |
 | `kingfisher_bringup` | ament_python | what the boat actually runs |
 
 ## Running the boat

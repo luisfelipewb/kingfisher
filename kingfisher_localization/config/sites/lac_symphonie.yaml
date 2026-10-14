@@ -1,0 +1,13 @@
+# Lac Symphonie (Metz). The datum is the origin of map: ENU tangent plane, the same as the
+# lac_symphonie world's <spherical_coordinates>. altitude is the water level, in the
+# SBG's altitude reference (above mean sea level), so the water is at z = 0.
+datum: {latitude: 49.1035229, longitude: 6.2171120, altitude: 191.74}
+
+# Lat/lon points published as static TF frames (map -> <name>) by geo_tf_publisher.
+# altitude is absolute WGS-84 metres (omit -> water level, z = 0); yaw_deg about z.
+points:
+  - {name: launch_site,   latitude: 49.1041521, longitude: 6.2164148}   # where we launch and test on the real lake
+  - {name: georgia_tech,  latitude: 49.1021349, longitude: 6.2151242}   # GT Europe building centre (OSM way 157475622)
+  - {name: island_center, latitude: 49.1038421, longitude: 6.2174103}   # centre of the island
+  - {name: lake_north,    latitude: 49.1056000, longitude: 6.2178000}   # northern tip
+  - {name: lake_south,    latitude: 49.1014718, longitude: 6.2175713}   # southern tip

@@ -16,6 +16,13 @@ kingfisher_gazebo/urdf/kingfisher_gazebo.urdf.xacro builds the sim on top.
   <xacro:kingfisher_thruster prefix="left" position="-0.53 0.3776 -0.16"/>
   <xacro:kingfisher_thruster prefix="right" position="-0.53 -0.3776 -0.16"/>
   <xacro:kingfisher_frame name="imu" xyz="-0.15 0 0.14"/>
+  <!-- FRD: the frame of the SBG driver's raw sbg/* messages (NED convention) -->
+  <link name="imu_link_ned"/>
+  <joint name="imu_ned_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${pi} 0 0"/>
+    <parent link="imu_link"/>
+    <child link="imu_link_ned"/>
+  </joint>
   <!-- The SBG NavSatFix is really at the primary antenna -->
   <xacro:kingfisher_frame name="gps" parent="imu_link"/>
   <xacro:kingfisher_frame name="gps_a1" parent="imu_link" xyz="0.0 -0.37 0.0"/>
