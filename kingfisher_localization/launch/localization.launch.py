@@ -37,7 +37,7 @@ def generate_launch_description():
         # sbg/* -> sensors/imu/imu/data, sensors/gps/gps/fix, odom and odom -> base_link
         launch_ros.actions.Node(
             package='kingfisher_localization', executable='sbg_localization',
-            parameters=[os.path.join(share, 'config', 'localization.yaml'), {
+            parameters=[{
                 'site_file': site_file,
                 'base_frame': frame('base_link'),
                 'imu_frame': frame('imu_link'),

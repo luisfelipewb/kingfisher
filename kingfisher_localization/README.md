@@ -23,15 +23,14 @@ ros2 launch kingfisher_localization localization.launch.py
 ```
 
 It runs separately from `kingfisher_bringup`, which publishes `base_link → imu_link` etc., so the tree
-joins at `kingfisher/base_link` when both are up. Args: `namespace` (`kingfisher`), `frame_prefix`
+joins at `kingfisher/base_link` when both are up. `odom` also waits for the bringup: the `imu_link`
+position in `base_link` comes from TF (the IMU and GPS topics don't wait). Args: `namespace` (`kingfisher`), `frame_prefix`
 (`kingfisher/`), `port` (`/dev/sbg`), `site` (`lac_symphonie`).
 
 ## Files
 
 - `config/sbg.yaml`: the driver's parameters. `confWithRos: false`, so the device keeps its own
   stored configuration; the `log_*` values only choose which `sbg/*` topics are published.
-- `config/localization.yaml`: `sbg_localization`, including the `imu_link` position in `base_link`
-  (keep in sync with the URDF).
 - `config/sites/<site>.yaml`: the datum (origin of `map`) and the site points.
 
 ## Dependencies

@@ -1,6 +1,0 @@
-/**/sbg_localization:
-  ros__parameters:
-    # imu_link in base_link, from kingfisher_description (imu_joint)
-    imu_xyz: [-0.15, 0.0, 0.14]
-    # variance of a position or velocity the SBG doesn't have (indoors)
-    unknown_variance: 1.0e+6

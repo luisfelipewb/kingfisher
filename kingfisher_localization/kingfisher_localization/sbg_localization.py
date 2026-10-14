@@ -9,6 +9,9 @@ SBG Ellipse (driver in NED) -> the localization contract, the same topics as the
 
 Without a valid position (indoors) odom is still published: the position is held at the last
 valid one (the datum if none) and the velocity is 0, both with a large variance.
+
+The imu_link position in base_frame comes from TF (the bringup's robot_state_publisher), looked
+up once: odom waits for it, the IMU and GPS topics don't.
 """
 
 import math
@@ -18,9 +21,10 @@ from nav_msgs.msg import Odometry
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.time import Time
 from sbg_driver.msg import SbgEkfNav, SbgEkfQuat, SbgGpsPos, SbgImuData
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
-from tf2_ros import TransformBroadcaster
+from tf2_ros import Buffer, TransformBroadcaster, TransformException, TransformListener
 
 from kingfisher_localization.geo import load_site
 
@@ -68,8 +72,6 @@ class SbgLocalization(Node):
         self._base_frame = self.declare_parameter('base_frame', 'base_link').value
         self._imu_frame = self.declare_parameter('imu_frame', 'imu_link').value
         self._gps_frame = self.declare_parameter('gps_frame', 'gps_link').value
-        # m, imu_link in base_frame (the URDF's imu_joint); the axes are assumed aligned
-        self._lever = tuple(self.declare_parameter('imu_xyz', [-0.15, 0.0, 0.14]).value)
         # m^2 and (m/s)^2, for a position or velocity the SBG doesn't have
         self._unknown_variance = self.declare_parameter('unknown_variance', 1e6).value
 
@@ -77,6 +79,10 @@ class SbgLocalization(Node):
         self._q_variance = (0.0,) * 3  # roll, pitch, yaw
         self._omega = (0.0, 0.0, 0.0)  # rad/s, FLU, from the last imu_data
         self._position = (0.0, 0.0, 0.0)  # base_frame in odom, the last valid one
+        # m, imu_frame in base_frame, from TF; the axes are assumed aligned (as in the URDF)
+        self._lever = None
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
 
         self._imu_pub = self.create_publisher(Imu, 'sensors/imu/imu/data', 10)
         self._fix_pub = self.create_publisher(NavSatFix, 'sensors/gps/gps/fix', 10)
@@ -124,8 +130,25 @@ class SbgLocalization(Node):
         fix.position_covariance_type = NavSatFix.COVARIANCE_TYPE_DIAGONAL_KNOWN
         self._fix_pub.publish(fix)
 
+    def _lookup_lever(self):
+        """Return imu_frame's position in base_frame, once TF has it, else None."""
+        if self._lever is None:
+            try:
+                t = self._tf_buffer.lookup_transform(
+                    self._base_frame, self._imu_frame, Time()).transform.translation
+            except TransformException as ex:
+                self.get_logger().warn(
+                    f'no odom until TF has {self._imu_frame} in {self._base_frame}: {ex}',
+                    throttle_duration_sec=5.0)
+                return None
+            self._lever = (t.x, t.y, t.z)
+            self.get_logger().info(f'{self._imu_frame} in {self._base_frame}: {self._lever}')
+            # Static: no need to keep listening to /tf
+            self._tf_listener.unregister()
+        return self._lever
+
     def _on_nav(self, msg):
-        if self._q is None:
+        if self._q is None or self._lookup_lever() is None:
             return
         q, status = self._q, msg.status
         odom = Odometry()
