@@ -35,6 +35,6 @@ position in `base_link` comes from TF (the IMU and GPS topics don't wait). Args:
 
 ## Dependencies
 
-`sbg_driver` isn't in rosdep: clone
-[sbg_ros2_driver](https://github.com/SBG-Systems/sbg_ros2_driver) next to `kingfisher` in the
-workspace.
+`sbg_driver` is in rosdep (`ros-jazzy-sbg-driver`): `rosdep install` covers it. The sim needs it
+too, since `kingfisher_sim` depends on this package (it doesn't run anything SBG). The boat builds
+[sbg_ros2_driver](https://github.com/SBG-Systems/sbg_ros2_driver) from source instead.
