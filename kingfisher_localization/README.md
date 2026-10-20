@@ -27,6 +27,11 @@ joins at `kingfisher/base_link` when both are up. `odom` also waits for the brin
 position in `base_link` comes from TF (the IMU and GPS topics don't wait). Args: `namespace` (`kingfisher`), `frame_prefix`
 (`kingfisher/`), `port` (`/dev/sbg`), `site` (`lac_symphonie`).
 
+## Nodes
+
+- `sbg_localization` (C++, `src/`): `sbg/*` → the IMU, GPS fix, `odom` and `odom → base_link` above.
+- `geo_tf_publisher` (Python, `kingfisher_localization/`): the site points as `map → <name>`.
+
 ## Files
 
 - `config/sbg.yaml`: the driver's parameters. `confWithRos: false`, so the device keeps its own
@@ -35,6 +40,7 @@ position in `base_link` comes from TF (the IMU and GPS topics don't wait). Args:
 
 ## Dependencies
 
-`sbg_driver` is in rosdep (`ros-jazzy-sbg-driver`): `rosdep install` covers it. The sim needs it
+`sbg_driver` (`ros-jazzy-sbg-driver`) and GeographicLib (`libgeographiclib-dev`, for `map`'s ENU
+plane) are in rosdep: `rosdep install` covers them. The sim needs them
 too, since `kingfisher_sim` depends on this package (it doesn't run anything SBG). The boat builds
 [sbg_ros2_driver](https://github.com/SBG-Systems/sbg_ros2_driver) from source instead.
