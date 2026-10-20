@@ -20,6 +20,7 @@ from geometry_msgs.msg import Quaternion, TransformStamped, Vector3
 from nav_msgs.msg import Odometry
 import rclpy
 from rclpy.executors import ExternalShutdownException
+from rclpy.experimental import EventsExecutor
 from rclpy.node import Node
 from rclpy.time import Time
 from sbg_driver.msg import SbgEkfNav, SbgEkfQuat, SbgGpsPos, SbgImuData
@@ -198,11 +199,15 @@ def main(args=None):
     """Spin the SBG localization node."""
     rclpy.init(args=args)
     node = SbgLocalization()
+    # Far cheaper per callback than rclpy.spin's SingleThreadedExecutor
+    executor = EventsExecutor()
+    executor.add_node(node)
     try:
-        rclpy.spin(node)
+        executor.spin()
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
+        executor.shutdown()
         node.destroy_node()
         rclpy.try_shutdown()
 
