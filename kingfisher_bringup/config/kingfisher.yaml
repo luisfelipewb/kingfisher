@@ -54,7 +54,7 @@
     source_list: ["sail/joint_states"]
     # Hz. Also keeps sail_link TF fresh while the sail is still: the encoder
     # only publishes on change.
-    rate: 20
+    rate: 10
 
 # Phidgets drivers, in the container in launch/robot.launch.py. All three reach the wired VINT
 # hub through the Phidget network server. The WiFi hub is "vint-wifi" at
@@ -85,6 +85,7 @@
     joint0_tick2rad: -0.00037399912542735635
     # 0 stops joint_states_ch0_decim_speed (unused)
     speed_filter_samples_len: 0
+    publish_rate: 10.0
 
 /**/phidgets_stepper:
   ros__parameters:
