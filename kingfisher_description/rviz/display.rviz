@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Waypoints1
       Splitter Ratio: 0.5
     Tree Height: 1167
   - Class: rviz_common/Displays
@@ -13,7 +14,7 @@ Panels:
     Property Tree Widget:
       Expanded: ~
       Splitter Ratio: 0.5
-    Tree Height: 167
+    Tree Height: 369
   - Class: rviz_common/Help
     Name: Help
   - Class: rviz_common/Transformation
@@ -310,6 +311,93 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /kingfisher/goal
       Value: true
+    - Alpha: 1
+      Arrow Length: 0.6000000238418579
+      Axes Length: 0.30000001192092896
+      Axes Radius: 0.009999999776482582
+      Class: rviz_default_plugins/PoseArray
+      Color: 230; 0; 126
+      Enabled: true
+      Head Length: 0.07000000029802322
+      Head Radius: 0.029999999329447746
+      Name: Waypoints
+      Shaft Length: 0.23000000417232513
+      Shaft Radius: 0.10000000149011612
+      Shape: Arrow (3D)
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /kingfisher/waypoints/active
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 170; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Bottles (virtual_detections)
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.30000001192092896
+      Style: Spheres
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /kingfisher/virtual_detections/bottles
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 0; 200; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Detections
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.5
+      Style: Spheres
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /kingfisher/detections
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -347,11 +435,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 38.95976638793945
+      Scale: 47.47377395629883
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 2.90042781829834
-      Y: 2.1047356128692627
+      X: 25.800840377807617
+      Y: 8.056828498840332
     Saved: ~
 Window Geometry:
   Displays:
@@ -360,12 +448,12 @@ Window Geometry:
   Help:
     collapsed: false
   Hide Left Dock: false
-  Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000200000000000001560000051dfc0200000004fb000000100044006900730070006c006100790073010000003f0000051d000000cc00fffffffb000000100044006900730070006c00610079007300000002c70000012d000000cc00fffffffb0000000800480065006c0070000000033a000000ba0000006f00fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000331000000c30000007e00ffffff00000001000001ac0000051dfc0200000001fb0000000a00560069006500770073010000003f0000051d000000a900ffffff000006f20000051d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Hide Right Dock: true
+  QMainWindow State: 000000ff00000000fd0000000200000000000001560000051dfc0200000004fb000000100044006900730070006c006100790073010000003f0000051d000000cc00fffffffb000000100044006900730070006c00610079007300000002c70000012d000000cc00fffffffb0000000800480065006c0070000000033a000000ba0000006f00fffffffb0000001c005400720061006e00730066006f0072006d006100740069006f006e0000000331000000c30000007e00ffffff00000001000001ac0000051dfc0200000001fb0000000a00560069006500770073000000003f0000051d000000a900ffffff000008a40000051d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Transformation:
     collapsed: false
   Views:
-    collapsed: false
+    collapsed: true
   Width: 2560
   X: 2560
   Y: 0
