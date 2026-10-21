@@ -10,6 +10,7 @@
   <exec_depend>rosserial_python</exec_depend>
   <exec_depend>wifi_monitor</exec_depend>
   <exec_depend>kingfisher_twist</exec_depend>
+  <exec_depend>topic_tools</exec_depend>
   <exec_depend>kingfisher_viz</exec_depend>
   <exec_depend>kingfisher_sail</exec_depend>
   <exec_depend>kingfisher_teleop</exec_depend>

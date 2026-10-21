@@ -9,7 +9,8 @@
 #
 # Hold LB (arcade) or RB (tank) to drive, never both: each publishes on its
 # own. Nothing is sent on release, so the MCU or cmd_drive_translate zeroes
-# the thrusters. Sail angles are rad, + counter-clockwise seen from above, and
+# the thrusters. Both go through teleop/cmd_drive and drive_mux, which A hands
+# to control/cmd_drive (the agents) and B back to teleop, its default. Sail angles are rad, + counter-clockwise seen from above, and
 # go to kingfisher_sail's sail_controller, in sim and on the boat:
 # - LB + D-pad left/right turns the sail (sail/cmd_velocity). On release the
 #   stream stops, and sail_controller stops the sail after its velocity_timeout;
@@ -39,7 +40,7 @@
     tank:
       type: topic
       interface_type: kingfisher_msgs/msg/Drive
-      topic_name: cmd_drive
+      topic_name: teleop/cmd_drive
       deadman_buttons: [10]
       axis_mappings:
         left:
@@ -149,6 +150,24 @@
       message_value:
         data:
           value: -2.3562
+
+    # A / B: drive_mux passes control/cmd_drive or teleop/cmd_drive to
+    # cmd_drive, once per press
+    drive_select_control:
+      type: service
+      interface_type: topic_tools_interfaces/srv/MuxSelect
+      service_name: drive_mux/select
+      buttons: [0]
+      service_request:
+        topic: control/cmd_drive
+
+    drive_select_teleop:
+      type: service
+      interface_type: topic_tools_interfaces/srv/MuxSelect
+      service_name: drive_mux/select
+      buttons: [1]
+      service_request:
+        topic: teleop/cmd_drive
 
     # Back + Start: run the sail calibration (boat only). Service entries take
     # `buttons`, not `deadman_buttons`.

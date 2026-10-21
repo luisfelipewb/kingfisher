@@ -42,11 +42,20 @@ def generate_launch_description():
             respawn=True, respawn_delay=2.0,
             output='screen'),
 
-        # cmd_vel -> cmd_drive
+        # cmd_vel -> teleop/cmd_drive
         launch_ros.actions.Node(
             package='kingfisher_twist', executable='kingfisher_twist_node',
             name='kingfisher_twist',
             parameters=[config],
+            remappings=[('cmd_drive', 'teleop/cmd_drive')],
+            output='screen'),
+
+        # teleop/cmd_drive (default) or control/cmd_drive -> cmd_drive,
+        # switched by drive_mux/select (joystick A / B)
+        launch_ros.actions.Node(
+            package='topic_tools', executable='mux',
+            name='drive_mux',
+            arguments=['cmd_drive', 'teleop/cmd_drive', 'control/cmd_drive'],
             output='screen'),
 
         # link liveness
@@ -69,7 +78,7 @@ def generate_launch_description():
                     ('right_thruster_frame', 'right_thruster_link'))}],
             output='screen'),
 
-        # joy -> cmd_vel, cmd_drive, sail commands. The joystick node
+        # joy -> cmd_vel, teleop/cmd_drive, drive_mux, sail commands. The joystick node
         # (kingfisher_teleop joy.launch.py) runs on the machine with the pad.
         launch_ros.actions.Node(
             package='joy_teleop', executable='joy_teleop',

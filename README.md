@@ -40,7 +40,10 @@ running a node on its own while debugging; those are not used in normal operatio
 
 `kingfisher_teleop` configures `joy`'s `game_controller_node` and `joy_teleop` for a Logitech F310 in
 XInput mode. Hold LB to drive through `cmd_vel` (left stick throttle, right stick turn), or RB for
-`cmd_drive` (one stick per thruster). Releasing either stops the stream, and the thrusters stop. The sail:
+`cmd_drive` (one stick per thruster). Releasing either stops the stream, and the thrusters stop. Both
+publish on `teleop/cmd_drive`. `drive_mux` (`topic_tools mux`) passes it to `cmd_drive` by default,
+**A** switches it to `control/cmd_drive` (the agents in `kingfisher_control`), and **B** switches back.
+The sail:
 - LB + D-pad left/right turns it counter-clockwise/clockwise (`sail/cmd_velocity`) until released;
 - RB + D-pad up, down, left, right sets it to 0, 180°, +90°, −90° (`sail/cmd_position`), and two
   arrows set the diagonals;
