@@ -9,7 +9,6 @@ ROS 2 stack for the Kingfisher ASV.
 | `kingfisher_msgs` | ament_cmake | `Drive` and `Sense`, wire-compatible with the MCU |
 | `kingfisher_description` | ament_cmake | URDF/xacro and meshes, no Gazebo |
 | `kingfisher_rosserial` | — | the MCU bridge, see its own README |
-| `kingfisher_twist` | ament_python | `cmd_vel` → `cmd_drive` |
 | `kingfisher_viz` | ament_python | thrust, wind and sail arrows for RViz |
 | `wifi_monitor` | ament_python | `has_wifi` link liveness |
 | `kingfisher_teleop` | ament_cmake | joystick config for `joy` + `joy_teleop` |
