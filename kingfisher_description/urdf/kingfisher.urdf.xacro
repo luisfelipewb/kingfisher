@@ -5,6 +5,9 @@ plain; the TF prefix comes from robot_state_publisher's frame_prefix.
 kingfisher_gazebo/urdf/kingfisher_gazebo.urdf.xacro builds the sim on top.
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="kingfisher">
+  <!-- False: sail unmounted, no mesh or collision -->
+  <xacro:arg name="sail" default="true"/>
+
   <xacro:include filename="$(find kingfisher_description)/urdf/kingfisher_base.urdf.xacro"/>
   <xacro:include filename="$(find kingfisher_description)/urdf/kingfisher_thruster.xacro"/>
   <xacro:include filename="$(find kingfisher_description)/urdf/kingfisher_sensors.xacro"/>
@@ -33,5 +36,6 @@ kingfisher_gazebo/urdf/kingfisher_gazebo.urdf.xacro builds the sim on top.
   <xacro:kingfisher_frame name="anemometer" xyz="-0.60 -0.19 0.25" rpy="0 0 ${pi}"/>
 
   <!-- Replaces static_tfs' sail_encoder_link -->
-  <xacro:kingfisher_sail xyz="-0.04 0 0.25"/>
+  <xacro:kingfisher_sail xyz="-0.04 0 0.25"
+                         mounted="${'$(arg sail)'.lower() in ['true', '1']}"/>
 </robot>

@@ -5,9 +5,10 @@ Rotating sail of the Kingfisher M200.
 Creates sail_motor_link, fixed to base_link, and sail_link 8 cm above it on a
 continuous joint about z (sail_joint). On the boat the sail encoder provides
 the joint angle; in sim, kingfisher_gazebo's position controller turns and holds it.
+mounted:=false drops the mesh and collision; the link and joint stay.
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="kingfisher_sail" params="xyz">
+  <xacro:macro name="kingfisher_sail" params="xyz mounted:=true">
     <xacro:property name="sail_mass" value="0.5"/>
     <xacro:property name="sail_height" value="0.70"/>
     <xacro:property name="sail_radius" value="0.14"/>
@@ -21,20 +22,22 @@ the joint angle; in sim, kingfisher_gazebo's position controller turns and holds
     </joint>
 
     <link name="sail_link">
-      <!-- Mesh is in mm, z up, rotation axis through its origin -->
-      <visual name="sail_visual">
-        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
-        <geometry>
-          <mesh filename="package://kingfisher_description/meshes/kingfisher_sail.stl" scale="0.001 0.001 0.001"/>
-        </geometry>
-        <material name="DarkGray"/>
-      </visual>
-      <collision name="sail_collision">
-        <origin xyz="0 0 ${sail_height/2}" rpy="0 0 0"/>
-        <geometry>
-          <cylinder radius="${sail_radius}" length="${sail_height}"/>
-        </geometry>
-      </collision>
+      <xacro:if value="${mounted}">
+        <!-- Mesh is in mm, z up, rotation axis through its origin -->
+        <visual name="sail_visual">
+          <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+          <geometry>
+            <mesh filename="package://kingfisher_description/meshes/kingfisher_sail.stl" scale="0.001 0.001 0.001"/>
+          </geometry>
+          <material name="DarkGray"/>
+        </visual>
+        <collision name="sail_collision">
+          <origin xyz="0 0 ${sail_height/2}" rpy="0 0 0"/>
+          <geometry>
+            <cylinder radius="${sail_radius}" length="${sail_height}"/>
+          </geometry>
+        </collision>
+      </xacro:if>
       <!-- Centre of mass and inertia per kg computed from the mesh, turned by pi as above -->
       <inertial>
         <origin xyz="-0.0234 0 0.348" rpy="0 0 0"/>
