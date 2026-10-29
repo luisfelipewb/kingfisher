@@ -5,7 +5,8 @@ The sail's command interface and its calibration. Two nodes:
 - `sail_controller` turns position and velocity commands into Phidgets stepper commands. It runs on
   the boat and in sim, where `kingfisher_sim`'s `sail_stepper_sim` stands in for the stepper.
 - `sail_calibration` finds the magnet switch on the mast, moves the sail to its true zero and zeroes the
-  stepper and the encoder there. Boat only.
+  stepper and the encoder there. It also measures the stepper and encoder scale against real turns.
+  Boat only.
 
 Supersedes `phidgets_launch/nodes/calibrate.py` in
 [sawasp](https://optimav.georgiatech-metz.fr/cedricpradalier/sawasp.git), which calibrated as soon as
@@ -34,6 +35,12 @@ ros2 topic pub -r 10 /kingfisher/sail/cmd_velocity std_msgs/msg/Float64 '{data: 
 The service answers immediately: `success: true` means the calibration has started. The log shows the
 progress, and `sail/calibrated` turns `true` when it is done.
 
+To check the stepper and encoder factors (recalibrate afterwards):
+
+```bash
+ros2 service call /kingfisher/sail/measure_scale kingfisher_msgs/srv/MeasureSailScale '{laps: 5}'
+```
+
 ## Interface
 
 Relative to the node's namespace (`/kingfisher` under bringup). Angles are rad, + counter-clockwise
@@ -46,10 +53,13 @@ seen from above; 0 is the sail along the hull, long side aft.
 | sub | `joint_states` (`sail_joint`) | `sensor_msgs/JointState` | controller |
 | pub | `sail/calibrated` | `std_msgs/Bool`, latched | calibration |
 | service | `sail/calibrate` | `std_srvs/Trigger` | calibration |
+| service | `sail/measure_scale` | `kingfisher_msgs/MeasureSailScale` | calibration |
 | pub | `phidgets_stepper/command` | `phidgets_msgs/StepperCommand` | both |
 | sub | `digital_input00` | `std_msgs/Bool`, `false` while on the switch | calibration |
 | sub | `phidgets_stepper/joint`, `phidgets_stepper/state` | `JointState`, `StepperState` | calibration |
+| sub | `sail/joint_states` | `JointState`, the encoder | calibration |
 | client | `phidgets_stepper/zero`, `phidgets_high_speed_encoder/zero` | `std_srvs/Trigger`, `phidgets_msgs/Trigger` | calibration |
+| client | `phidgets_stepper/get_parameters`, `phidgets_high_speed_encoder/get_parameters` | `rcl_interfaces/GetParameters` | calibration |
 
 ## sail_controller
 
@@ -89,8 +99,8 @@ Both measured edges are crossings of the whole switch at the same constant speed
 directions, so detection latency shifts `p1` and `p2` equally and cancels in the average. That is what
 the clear step is for.
 
-A call is refused while a calibration is running, before any stepper joint state has arrived, or while
-either zero service is unavailable.
+A call is refused while a calibration or a scale measurement is running, before any stepper joint state
+has arrived, or while either zero service is unavailable.
 
 | parameter | default | |
 |---|---|---|
@@ -100,6 +110,27 @@ either zero service is unavailable.
 | `offset_move_delay` | 0.8 s | pause between the center zero and the offset move |
 | `position_tolerance` | 1e-3 rad | "arrived" threshold for the step moves |
 | `encoder_channel` | 0 | channel passed to the encoder zero service |
+
+### Scale measurement
+
+The stepper `rescale_factor` and the encoder `joint0_tick2rad` both count the motor side of the 14:1
+reduction, so they agree with each other even when the ratio is wrong. The switch is the only reference
+on the sail side. `sail/measure_scale` takes the number of `laps`:
+
+1. **Run** at `measure_velocity` (positive). `sail/calibrated` turns `false`.
+2. **Reference**: the first entry into the switch, at least 1 s after the start.
+3. **Laps**: at each later entry, both positions are interpolated between joint samples at the entry
+   time (the stepper joint is published at only 2 Hz). Each lap is logged.
+4. **Stop** after `laps` laps. Then log, for each source, the mean lap, the spread between laps and the
+   error per lap, and the stepper − encoder gap. Fetch the current factors from the drivers and log the
+   suggested ones, `old × 2π / mean lap`, ready to paste into `kingfisher.yaml`.
+
+Entering in one direction only cancels the switch width and the detection latency. A spread larger than
+the error points to slip after the gearbox rather than a wrong ratio. A stepper − encoder gap means missed
+steps. After the laps the zero is off by the measured error, so recalibrate.
+
+Refused like `sail/calibrate`, and also for `laps: 0`. If a driver's parameter service is unavailable,
+the correction factor is logged instead.
 
 ## Failure modes
 

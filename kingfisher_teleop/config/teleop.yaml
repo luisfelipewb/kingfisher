@@ -62,7 +62,7 @@
       axis_mappings:
         data:
           button: 13
-          scale: 2.0
+          scale: 0.8
           offset: 0.0
 
     sail_turn_right:
@@ -73,7 +73,7 @@
       axis_mappings:
         data:
           button: 14
-          scale: -2.0
+          scale: -0.8
           offset: 0.0
 
     # RB + D-pad: sail/cmd_position, sent once per press. A diagonal also

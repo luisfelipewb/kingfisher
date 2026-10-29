@@ -122,7 +122,7 @@
     # rad/s. STEP velocity limit and RUN clamp.
     max_velocity: 2.0
     # seconds without sail/cmd_velocity before a jog stops
-    velocity_timeout: 0.25
+    velocity_timeout: 0.10
     # seconds after the last non-zero sail/cmd_velocity during which
     # sail/cmd_position is ignored
     position_holdoff: 1.0

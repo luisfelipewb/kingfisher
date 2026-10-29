@@ -1,0 +1,6 @@
+# Laps to run in the positive direction, at least 1
+uint32 laps
+---
+# true when the measurement has started; the results are logged
+bool success
+string message
