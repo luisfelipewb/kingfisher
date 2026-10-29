@@ -81,9 +81,9 @@
     # overridden in robot.launch.py with frame_prefix
     frame_id: "sail_motor_link"
     joint0_name: "sail_joint"
-    # 2*pi / (R * 300 * 4): 300 CPR, x4 quadrature, R = 13.73 reduction
-    # (sold as 14:1; measured with sail/measure_scale)
-    joint0_tick2rad: -0.00038126455555925856
+    # 2*pi / (R * 300 * 4): 300 CPR, x4 quadrature, R = (63/17)^2 = 13.7336,
+    # two planetary stages (sold as 14:1; confirmed with sail/measure_scale)
+    joint0_tick2rad: -0.0003812548403827372
     # 0 stops joint_states_ch0_decim_speed (unused)
     speed_filter_samples_len: 0
     publish_rate: 10.0
@@ -102,9 +102,9 @@
     # rad/s (rescaled units). The driver's default is the device max, which
     # can fail its own range check after rounding.
     velocity_limit: 2.0
-    # (1/16 step per count) * (1.8 deg per step) / R, in rad, with the
-    # measured R = 13.73 (see the encoder)
-    rescale_factor: -0.00014298561960310208
+    # (1/16 step per count) * (1.8 deg per step) / R, in rad, with
+    # R = (63/17)^2 (see the encoder)
+    rescale_factor: -0.00014297056514352645
 
 /**/sail_calibration:
   ros__parameters:
