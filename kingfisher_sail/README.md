@@ -113,9 +113,9 @@ has arrived, or while either zero service is unavailable.
 
 ### Scale measurement
 
-The stepper `rescale_factor` and the encoder `joint0_tick2rad` both count the motor side of the 14:1
-reduction, so they agree with each other even when the ratio is wrong. The switch is the only reference
-on the sail side. `sail/measure_scale` takes the number of `laps`:
+The stepper `rescale_factor` and the encoder `joint0_tick2rad` both count the motor side of the
+reduction (13.73:1, sold as 14:1), so they agree with each other even when the ratio is wrong. The
+switch is the only reference on the sail side. `sail/measure_scale` takes the number of `laps`:
 
 1. **Run** at `measure_velocity` (positive). `sail/calibrated` turns `false`.
 2. **Reference**: the first entry into the switch, at least 1 s after the start.
