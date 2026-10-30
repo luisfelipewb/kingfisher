@@ -3,7 +3,7 @@
 <package format="3">
   <name>kingfisher_sail</name>
   <version>0.0.0</version>
-  <description>Sail command interface and calibration</description>
+  <description>Sail command interface, calibration and wind following</description>
   <maintainer email="luis.batista@gatech.edu">kingfisher</maintainer>
   <license>TODO: License declaration</license>
 
@@ -11,6 +11,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>std_srvs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>phidgets_msgs</exec_depend>
   <exec_depend>kingfisher_msgs</exec_depend>
   <exec_depend>rcl_interfaces</exec_depend>

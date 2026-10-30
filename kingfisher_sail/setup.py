@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='kingfisher',
     maintainer_email='kingfisher@todo.todo',
-    description='Sail command interface and calibration',
+    description='Sail command interface, calibration and wind following',
     license='TODO: License declaration',
     extras_require={
         'test': [
@@ -26,6 +26,7 @@ setup(
         'console_scripts': [
             'sail_calibration = kingfisher_sail.sail_calibration:main',
             'sail_controller = kingfisher_sail.sail_controller:main',
+            'sail_follow_wind = kingfisher_sail.sail_follow_wind:main',
         ],
     },
 )

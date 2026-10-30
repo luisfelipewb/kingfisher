@@ -1,12 +1,13 @@
 # kingfisher_sail
 
-The sail's command interface and its calibration. Two nodes:
+The sail's command interface, its calibration and wind following. Three nodes:
 
 - `sail_controller` turns position and velocity commands into Phidgets stepper commands. It runs on
   the boat and in sim, where `kingfisher_sim`'s `sail_stepper_sim` stands in for the stepper.
 - `sail_calibration` finds the magnet switch on the mast, moves the sail to its true zero and zeroes the
   stepper and the encoder there. It also measures the stepper and encoder scale against real turns.
   Boat only.
+- `sail_follow_wind` keeps the sail feathered in the apparent wind. Run by hand.
 
 Supersedes `phidgets_launch/nodes/calibrate.py` in
 [sawasp](https://optimav.georgiatech-metz.fr/cedricpradalier/sawasp.git), which calibrated as soon as
@@ -41,6 +42,14 @@ To check the stepper and encoder factors (recalibrate afterwards):
 ros2 service call /kingfisher/sail/measure_scale kingfisher_msgs/srv/MeasureSailScale '{laps: 5}'
 ```
 
+To follow the wind, once calibrated (no launch file starts it). Parameters go on the command line;
+add `-p use_sim_time:=true` in sim:
+
+```bash
+ros2 run kingfisher_sail sail_follow_wind --ros-args -r __ns:=/kingfisher
+ros2 run kingfisher_sail sail_follow_wind --ros-args -r __ns:=/kingfisher -p angle_of_attack:=0.15
+```
+
 ## Interface
 
 Relative to the node's namespace (`/kingfisher` under bringup). Angles are rad, + counter-clockwise
@@ -51,6 +60,9 @@ seen from above; 0 is the sail along the hull, long side aft.
 | sub | `sail/cmd_position` | `std_msgs/Float64`, rad | controller |
 | sub | `sail/cmd_velocity` | `std_msgs/Float64`, rad/s | controller |
 | sub | `joint_states` (`sail_joint`) | `sensor_msgs/JointState` | controller |
+| sub | `sensors/anemometer/wind` | `geometry_msgs/Vector3Stamped` | follow_wind |
+| sub | `joint_states` (`sail_joint`) | `sensor_msgs/JointState` | follow_wind |
+| pub | `sail/cmd_position` | `std_msgs/Float64`, rad | follow_wind |
 | pub | `sail/calibrated` | `std_msgs/Bool`, latched | calibration |
 | service | `sail/calibrate` | `std_srvs/Trigger` | calibration |
 | service | `sail/measure_scale` | `kingfisher_msgs/MeasureSailScale` | calibration |
@@ -131,6 +143,24 @@ steps. After the laps the zero is off by the measured error, so recalibrate.
 
 Refused like `sail/calibrate`, and also for `laps: 0`. If a driver's parameter service is unavailable,
 the correction factor is logged instead.
+
+## sail_follow_wind
+
+- **Feathered.** The target is where the wind comes from, `atan2(−y, −x)` of the anemometer reading in
+  `base_link`, minus `angle_of_attack`. At 0 the nose points into the wind: drag only.
+- **One `sail/cmd_position` per reading** (1.875 Hz), except below `min_wind_speed`, where the sail
+  holds, and within `deadband` of the measured `sail_joint` angle. So the follower takes the sail back
+  after a jog or a preset, and doesn't keep the stepper hunting.
+- `sail_controller` does the rest: nothing moves until calibrated, and a jog overrides the follower
+  until `position_holdoff` after it.
+- The anemometer is 0.6 m aft of the mast, so in a turn the sail's apparent wind differs slightly.
+
+| parameter | default | |
+|---|---|---|
+| `angle_of_attack` | 0.0 rad | sail angle from the feathered position, + clockwise from above |
+| `min_wind_speed` | 0.5 m/s | below this, the sail holds |
+| `deadband` | 0.05 rad | a target closer than this to the measured angle is skipped |
+| `joint` | `sail_joint` | the measured joint in `joint_states` |
 
 ## Failure modes
 
