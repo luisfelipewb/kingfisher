@@ -4,8 +4,8 @@ Keeps the sail feathered in the apparent wind.
 Turns ``sensors/anemometer/wind`` (geometry_msgs/Vector3Stamped in base_link, FLU, m/s,
 pointing where the wind goes) into ``sail/cmd_position`` for sail_controller:
 
-* the target is the direction the wind comes from, minus ``angle_of_attack``, so at 0 the
-  sail's nose points into the wind;
+* the target is the direction the wind comes from, turned ``angle_of_attack_deg`` toward the
+  bow, so lift pushes forward from either side; at 0 the sail's nose points into the wind;
 * below ``min_wind_speed`` nothing is sent, and the sail holds;
 * a target within ``deadband`` of the measured ``sail_joint`` angle is skipped, so the
   follower also takes the sail back after a jog or a preset.
@@ -13,7 +13,7 @@ pointing where the wind goes) into ``sail/cmd_position`` for sail_controller:
 Calibration, wrapping, the velocity limit and the teleop override are sail_controller's.
 """
 
-from math import atan2, hypot
+from math import atan2, copysign, hypot, radians
 
 from geometry_msgs.msg import Vector3Stamped
 from kingfisher_sail.sail_controller import wrap
@@ -26,7 +26,8 @@ from std_msgs.msg import Float64
 
 def feather_angle(vx, vy, angle_of_attack=0.0):
     """Return the sail angle for the wind (vx, vy) in base_link, pointing where it goes."""
-    return wrap(atan2(-vy, -vx) - angle_of_attack)
+    wind = atan2(-vy, -vx)
+    return wrap(wind - copysign(angle_of_attack, wind))
 
 
 class SailFollowWind(Node):
@@ -35,8 +36,9 @@ class SailFollowWind(Node):
     def __init__(self):
         super().__init__('sail_follow_wind')
 
-        # rad, the sail angle from the feathered position (alpha, as in the sim's aero model)
-        self._angle_of_attack = self.declare_parameter('angle_of_attack', 0.0).value
+        # deg, the sail angle from the feathered position, toward the bow
+        # (alpha, as in the sim's aero model)
+        self._angle_of_attack = radians(self.declare_parameter('angle_of_attack_deg', 0.0).value)
         # m/s, below this the wind direction is ignored and the sail holds
         self._min_wind_speed = self.declare_parameter('min_wind_speed', 0.5).value
         # rad, a target closer than this to the measured sail angle is skipped

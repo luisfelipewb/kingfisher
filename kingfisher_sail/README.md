@@ -47,7 +47,7 @@ add `-p use_sim_time:=true` in sim:
 
 ```bash
 ros2 run kingfisher_sail sail_follow_wind --ros-args -r __ns:=/kingfisher
-ros2 run kingfisher_sail sail_follow_wind --ros-args -r __ns:=/kingfisher -p angle_of_attack:=0.15
+ros2 run kingfisher_sail sail_follow_wind --ros-args -r __ns:=/kingfisher -p angle_of_attack_deg:=9.0
 ```
 
 ## Interface
@@ -147,7 +147,8 @@ the correction factor is logged instead.
 ## sail_follow_wind
 
 - **Feathered.** The target is where the wind comes from, `atan2(−y, −x)` of the anemometer reading in
-  `base_link`, minus `angle_of_attack`. At 0 the nose points into the wind: drag only.
+  `base_link`, turned `angle_of_attack_deg` toward the bow, so lift pushes forward from either side. At
+  0 the nose points into the wind: drag only.
 - **One `sail/cmd_position` per reading** (1.875 Hz), except below `min_wind_speed`, where the sail
   holds, and within `deadband` of the measured `sail_joint` angle. So the follower takes the sail back
   after a jog or a preset, and doesn't keep the stepper hunting.
@@ -157,7 +158,7 @@ the correction factor is logged instead.
 
 | parameter | default | |
 |---|---|---|
-| `angle_of_attack` | 0.0 rad | sail angle from the feathered position, + clockwise from above |
+| `angle_of_attack_deg` | 0.0° | sail angle from the feathered position, toward the bow on either side |
 | `min_wind_speed` | 0.5 m/s | below this, the sail holds |
 | `deadband` | 0.05 rad | a target closer than this to the measured angle is skipped |
 | `joint` | `sail_joint` | the measured joint in `joint_states` |

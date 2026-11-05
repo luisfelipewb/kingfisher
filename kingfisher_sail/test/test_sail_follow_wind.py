@@ -22,10 +22,20 @@ def test_from_astern():
     assert abs(feather_angle(5.0, 0.0)) == pytest.approx(pi)
 
 
-def test_angle_of_attack_turns_clockwise():
-    assert feather_angle(-5.0, 0.0, 0.3) == pytest.approx(-0.3)
+@pytest.mark.parametrize('vx, vy, expected', [
+    # From port
+    (0.0, -5.0, pi / 2 - 0.3),
+    # From starboard
+    (0.0, 5.0, -pi / 2 + 0.3),
+    # From the port quarter
+    (5.0, -5.0, 3 * pi / 4 - 0.3),
+    # From the starboard quarter
+    (5.0, 5.0, -3 * pi / 4 + 0.3),
+])
+def test_angle_of_attack_turns_toward_the_bow(vx, vy, expected):
+    assert feather_angle(vx, vy, 0.3) == pytest.approx(expected)
 
 
-def test_wrapped():
-    # From port quarter, with an angle of attack past -pi
-    assert feather_angle(5.0, -5.0, -1.0) == pytest.approx(3 * pi / 4 + 1.0 - 2 * pi)
+def test_angle_of_attack_from_ahead():
+    # Either side will do
+    assert abs(feather_angle(-5.0, 0.0, 0.3)) == pytest.approx(0.3)
